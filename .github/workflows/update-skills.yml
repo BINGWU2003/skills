@@ -1,0 +1,67 @@
+name: 更新外部 Skills
+
+on:
+  schedule:
+    # 每周一北京时间 04:17 运行，避开整点任务高峰。
+    - cron: "17 4 * * 1"
+      timezone: "Asia/Shanghai"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-skills
+  cancel-in-progress: false
+
+jobs:
+  update:
+    name: 检查并同步更新
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 检出仓库与子模块
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22.20.0"
+          cache: pnpm
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 更新外部 Skills
+        run: pnpm run update
+
+      - name: 校验 Skills
+        run: pnpm run check
+
+      - name: 创建更新 PR
+        uses: peter-evans/create-pull-request@v8
+        with:
+          add-paths: |
+            .gitmodules
+            sources
+            skills
+          branch: automation/update-skills
+          delete-branch: true
+          commit-message: "chore: 自动更新外部 Skills"
+          title: "chore: 自动更新外部 Skills"
+          body: |
+            定时检查发现外部 Skill 存在更新。
+
+            - 更新 Git submodule 指针
+            - 同步发布目录
+            - 已运行 `pnpm run check`
+
+            请在合并前检查上游 Skill 的行为变化。
