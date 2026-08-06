@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { spawnSync } from 'node:child_process';
-import { cp, mkdir, readFile, rm, stat } from 'node:fs/promises';
+import { cp, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -45,6 +45,57 @@ async function assertSkillExists(sourcePath, skillName) {
   }
 }
 
+function normalizeSkillFrontmatter(content, skillName) {
+  const lineEnding = content.includes('\r\n') ? '\r\n' : '\n';
+  const lines = content.split(/\r?\n/);
+
+  if (lines[0] !== '---') {
+    throw new Error(`${skillName} 的 SKILL.md 缺少 YAML frontmatter。`);
+  }
+
+  const closingIndex = lines.indexOf('---', 1);
+  if (closingIndex === -1) {
+    throw new Error(`${skillName} 的 SKILL.md frontmatter 没有结束标记。`);
+  }
+
+  const frontmatterLines = lines.slice(1, closingIndex);
+  const fields = new Map();
+
+  for (let index = 0; index < frontmatterLines.length;) {
+    const match = frontmatterLines[index].match(/^([a-zA-Z0-9_-]+):(?:\s|$)/);
+    if (!match) {
+      index += 1;
+      continue;
+    }
+
+    const startIndex = index;
+    index += 1;
+    while (index < frontmatterLines.length && !/^[a-zA-Z0-9_-]+:(?:\s|$)/.test(frontmatterLines[index])) {
+      index += 1;
+    }
+    fields.set(match[1], frontmatterLines.slice(startIndex, index));
+  }
+
+  const requiredFields = ['name', 'description'];
+  const missingField = requiredFields.find(field => !fields.has(field));
+  if (missingField) {
+    throw new Error(`${skillName} 的 SKILL.md frontmatter 缺少 ${missingField}。`);
+  }
+
+  const bodyLines = lines.slice(closingIndex + 1);
+  while (bodyLines.at(-1) === '') {
+    bodyLines.pop();
+  }
+
+  return [
+    '---',
+    ...requiredFields.flatMap(field => fields.get(field)),
+    '---',
+    ...bodyLines,
+    '',
+  ].join(lineEnding);
+}
+
 async function syncSkill(skillName, config, shouldUpdate) {
   const submodulePath = path.resolve(repoRoot, config.submodule);
   const sourcePath = path.resolve(submodulePath, config.skillPath);
@@ -70,6 +121,16 @@ async function syncSkill(skillName, config, shouldUpdate) {
     force: true,
     filter: candidatePath => !['.git', '.gitignore'].includes(path.basename(candidatePath)),
   });
+
+  if (config.normalizeFrontmatter) {
+    const destinationSkillPath = path.join(destinationPath, 'SKILL.md');
+    const destinationSkill = await readFile(destinationSkillPath, 'utf8');
+    await writeFile(
+      destinationSkillPath,
+      normalizeSkillFrontmatter(destinationSkill, skillName),
+      'utf8',
+    );
+  }
 
   const sourceCommit = runGit(['-C', submodulePath, 'rev-parse', '--short', 'HEAD']);
   console.log(`已从 ${skillName}@${sourceCommit} 同步到 skills/${skillName}。`);
