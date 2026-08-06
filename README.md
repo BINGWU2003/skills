@@ -1,85 +1,142 @@
 # HJC Skills
 
-个人 Agent Skills 聚合仓库。
+个人 Agent Skills 聚合仓库。这里集中维护可复用的 Skill，并通过统一的
+`skills/` 发布目录供 [`skills`](https://skills.sh/) CLI 发现和安装。
 
-## 目录结构
+## 可用 Skills
+
+| Skill | 用途 |
+| --- | --- |
+| [`agent-git`](skills/agent-git/) | 使用 checkpoint、status、undo 和 squash 工作流，帮助 Agent 安全管理 Git 修改。 |
+| [`weekly-git-report`](skills/weekly-git-report/) | 根据 Git 提交记录生成、整理或保存周报。 |
+| [`hello-skills`](skills/hello-skills/) | 验证 Skill 的发现、安装和显式调用流程。 |
+
+## 快速开始
+
+先查看仓库中可安装的 Skill：
+
+```bash
+npx skills add BINGWU2003/skills --list
+```
+
+安装指定 Skill：
+
+```bash
+npx skills add BINGWU2003/skills --skill agent-git
+```
+
+默认安装到当前项目；如需安装到用户级目录，追加 `--global`。也可以把
+`agent-git` 替换为上表中的其他 Skill 名称。
+
+## 本地开发
+
+环境要求：Node.js `>=22.20.0`、pnpm `10.34.4`。
+
+```bash
+git clone --recurse-submodules https://github.com/BINGWU2003/skills.git
+cd skills
+pnpm install
+```
+
+如果克隆时没有初始化子模块，可稍后执行：
+
+```bash
+pnpm run sources:init
+```
+
+### 目录结构
 
 ```text
 .
 ├── skills/                # 对外发布、可被 skills CLI 发现的 Skill
 │   └── <skill-name>/
-│       └── SKILL.md
-├── sources/               # 通过 Git submodule 引用的其他项目
-├── scripts/               # Skill 同步脚本
-├── .gitmodules            # 子模块来源配置
-├── skills.config.json     # 外部 Skill 同步配置
-├── package.json           # 项目命令入口
-├── pnpm-lock.yaml         # pnpm 依赖锁文件
+│       ├── SKILL.md       # Skill 入口
+│       ├── references/    # 可选：详细参考资料
+│       ├── scripts/       # 可选：可执行工具
+│       └── assets/        # 可选：输出素材
+├── sources/               # 通过 Git submodule 引用的 Skill 来源
+├── scripts/               # 仓库维护脚本
+├── skills.config.json     # 外部 Skill 的来源和同步路径
+├── .gitmodules            # Git submodule 配置
 └── AGENTS.md              # 仓库维护约定
 ```
 
-## 初始化
+`sources/` 只保存外部项目的子模块引用；真正供 CLI 发现和安装的内容始终位于
+`skills/`。安装器通常不会递归拉取子模块，因此外部 Skill 也必须同步到发布目录。
 
-```bash
-pnpm install
+## 添加 Skill
+
+### 添加仓库内维护的 Skill
+
+在 `skills/<skill-name>/` 下创建 `SKILL.md`。目录名和 frontmatter 中的 `name`
+必须一致，并且只能使用小写字母、数字和连字符：
+
+```yaml
+---
+name: example-skill
+description: 简洁说明该 Skill 在什么情况下使用。
+---
 ```
 
-## 添加项目来源
+frontmatter 只保留 `name` 和 `description`。较长的说明、工具和素材应分别放入
+`references/`、`scripts/` 和 `assets/`。
+
+### 添加外部 Skill
+
+先把来源项目添加为子模块：
 
 ```bash
 pnpm run sources:add -- <repository-url> sources/<project-name>
-pnpm run sources:init
 ```
 
-`.gitmodules` 用于聚合其他项目的 Skill 源码。需要通过 `skills` CLI
-发布的 Skill，应同步到主仓库的 `skills/<skill-name>/` 并提交；安装器通常不会递归拉取子模块。
+然后在 `skills.config.json` 中登记子模块路径和 Skill 在来源项目中的路径：
 
-## 同步外部 Skills
+```json
+{
+  "example-skill": {
+    "submodule": "sources/example-project",
+    "skillPath": "path/to/example-skill"
+  }
+}
+```
 
-外部 Skill 的子模块和源路径统一配置在 `skills.config.json`，发布副本位于
-`skills/<skill-name>`。
+不要直接修改由外部来源同步生成的 `skills/<skill-name>/`；改动应先在来源项目中
+完成，再同步到本仓库。
 
-同步所有 Skill 的当前锁定版本：
+## 同步与更新
+
+把当前锁定的子模块版本同步到发布目录：
 
 ```bash
+# 同步全部外部 Skills
 pnpm run sync
-```
 
-更新所有子模块到 `main` 的最新提交并同步：
-
-```bash
-pnpm run update
-```
-
-只处理指定 Skill 时，在命令后传入名称：
-
-```bash
+# 只同步指定 Skill
 pnpm run sync -- <skill-name>
+```
+
+拉取子模块 `main` 分支的最新提交并同步：
+
+```bash
+# 更新全部外部 Skills
+pnpm run update
+
+# 只更新指定 Skill
 pnpm run update -- <skill-name>
 ```
 
-更新后需要同时提交子模块指针和对应 `skills/<skill-name>` 的内容。
+更新完成后，需要同时提交子模块指针和对应的 `skills/<skill-name>/` 发布内容。
 
-## 检查与安装
+## 校验
+
+提交前运行：
 
 ```bash
-# 检查 Skill 发现结果，不修改文件
 pnpm run check
+```
 
-# 仅查看能够发现的 Skill
+该命令只检查 Skill 发现结果，不会修改文件。也可以使用以下命令单独查看结果：
+
+```bash
 pnpm run skills:list
-
-# 从当前仓库安装指定 Skill
-pnpm run skills:install -- --skill <skill-name>
-
-# 从其他仓库安装 Skill
-pnpm run skills:add -- <owner>/<repo> --skill <skill-name>
 ```
-
-每个 Skill 至少包含：
-
-```text
-skills/<skill-name>/SKILL.md
-```
-
-`SKILL.md` 的 YAML frontmatter 必须包含 `name` 和 `description`。
