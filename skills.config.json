@@ -3,6 +3,14 @@
     "submodule": "sources/agent-git",
     "skillPath": "packages/skill/skills/agent-git"
   },
+  "drawio-skill": {
+    "submodule": "sources/drawio-skill",
+    "skillPath": "skills/drawio-skill"
+  },
+  "excalidraw-diagram": {
+    "submodule": "sources/excalidraw-diagram-skill",
+    "skillPath": "."
+  },
   "grill-me": {
     "submodule": "sources/mattpocock-skills",
     "skillPath": "skills/productivity/grill-me"
