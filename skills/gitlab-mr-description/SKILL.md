@@ -1,6 +1,9 @@
 ---
 name: gitlab-mr-description
 description: Write or update a GitLab MR description. Reads the branch diff, drafts structured markdown using GitLab's standard sections, and applies conventions for feature flags, database queries, and local testing matrices. Use when opening a new MR or refreshing an existing description.
+version: 1.1.0
+license: MIT
+category: Development Workflow
 ---
 
 # GitLab MR Description
@@ -32,3 +35,4 @@ Answer: *What does this MR add or fix? Why? What surfaces does it touch? Does th
 
 - **Full section template**: [references/TEMPLATE.md](references/TEMPLATE.md)
 - **Per-section writing rules and what to omit**: [references/SECTION_RULES.md](references/SECTION_RULES.md)
+

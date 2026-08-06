@@ -21,23 +21,19 @@
   },
   "gitlab-babysit-mr": {
     "submodule": "sources/gitlab-ai-skills",
-    "skillPath": "skills/gitlab-babysit-mr",
-    "normalizeFrontmatter": true
+    "skillPath": "skills/gitlab-babysit-mr"
   },
   "gitlab-mr-description": {
     "submodule": "sources/gitlab-ai-skills",
-    "skillPath": "skills/gitlab-mr-description",
-    "normalizeFrontmatter": true
+    "skillPath": "skills/gitlab-mr-description"
   },
   "gitlab-pipeline-watch": {
     "submodule": "sources/gitlab-ai-skills",
-    "skillPath": "skills/gitlab-pipeline-watch",
-    "normalizeFrontmatter": true
+    "skillPath": "skills/gitlab-pipeline-watch"
   },
   "glab": {
     "submodule": "sources/gitlab-ai-skills",
-    "skillPath": "skills/glab",
-    "normalizeFrontmatter": true
+    "skillPath": "skills/glab"
   },
   "weekly-git-report": {
     "submodule": "sources/weekly-git-report",

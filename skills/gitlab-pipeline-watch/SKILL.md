@@ -1,6 +1,12 @@
 ---
 name: gitlab-pipeline-watch
 description: Watch GitLab MR pipelines and react to state changes
+version: 1.0.0
+category: Development Workflow
+license: MIT
+metadata:
+  audience: developers
+  workflow: gitlab-ci
 ---
 
 # MR Watch Skill

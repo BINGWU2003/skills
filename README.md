@@ -74,8 +74,9 @@ description: 简洁说明该 Skill 在什么情况下使用。
 ---
 ```
 
-frontmatter 只保留 `name` 和 `description`。较长的说明、工具和素材应分别放入
-`references/`、`scripts/` 和 `assets/`。
+`SKILL.md` 应遵循 [Agent Skills 规范](https://agentskills.io/specification)。仓库内
+自行维护的 Skill 可按需要使用规范支持的 frontmatter 字段；较长的说明、工具和
+素材应分别放入 `references/`、`scripts/` 和 `assets/`。
 
 ### 添加外部 Skill
 
@@ -96,8 +97,8 @@ pnpm run sources:add -- <repository-url> sources/<project-name>
 }
 ```
 
-不要直接修改由外部来源同步生成的 `skills/<skill-name>/`；改动应先在来源项目中
-完成，再同步到本仓库。
+不要直接修改由外部来源同步生成的 `skills/<skill-name>/`；同步时保持上游目录和
+frontmatter 原样。改动应先在来源项目中完成，再同步到本仓库。
 
 ## 同步与更新
 

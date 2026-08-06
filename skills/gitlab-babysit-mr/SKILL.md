@@ -1,6 +1,14 @@
 ---
 name: gitlab-babysit-mr
 description: Monitor a GitLab MR's pipeline until green. Classifies failures (flaky, master-broken, lint, coverage, real), retries jobs where appropriate, makes light-touch auto-fixes, and posts findings as an MR comment.
+version: 0.10.0
+category: Development Workflow
+license: MIT
+compatibility: opencode
+argument-hint: <URL of the MR to babysit>
+metadata:
+  audience: developers
+  workflow: gitlab
 ---
 
 # gitlab-babysit-mr
