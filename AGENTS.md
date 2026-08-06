@@ -23,6 +23,7 @@
 - 使用 `git submodule add <url> sources/<project-name>` 添加来源。
 - 不直接修改 `sources/` 中属于子模块的内容；修改应在对应项目仓库完成。
 - 子模块中的 Skill 需要同步到 `skills/` 后再从本仓库发布。
+- 对已有同步脚本的 Skill，运行对应的 `scripts/sync-*.mjs` 更新发布副本，不直接修改生成内容。
 
 ## Git 提交
 

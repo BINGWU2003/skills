@@ -1,1 +1,5 @@
 # 使用 `git submodule add <repository-url> sources/<project-name>` 添加 Skill 来源。
+[submodule "sources/agent-git"]
+	path = sources/agent-git
+	url = https://github.com/BINGWU2003/agent-git.git
+	branch = main
