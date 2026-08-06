@@ -3,3 +3,7 @@
 	path = sources/agent-git
 	url = https://github.com/BINGWU2003/agent-git.git
 	branch = main
+[submodule "sources/weekly-git-report"]
+	path = sources/weekly-git-report
+	url = https://github.com/BINGWU2003/weekly-git-report.git
+	branch = main

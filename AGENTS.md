@@ -16,14 +16,15 @@
 - Skill 名称仅使用小写字母、数字和连字符，并与目录名一致。
 - `SKILL.md` frontmatter 只保留 `name` 和 `description`。
 - `SKILL.md` 保持精简；详细资料放入 `references/`，可执行工具放入 `scripts/`，输出素材放入 `assets/`。
-- 修改后运行 `pnpm run check` 同步发布副本并检查发现结果。
+- 修改后运行 `pnpm run check` 检查 Skill 发现结果；该命令不得修改文件。
 
 ## 子模块
 
 - 使用 `pnpm run sources:add -- <url> sources/<project-name>` 添加来源。
 - 不直接修改 `sources/` 中属于子模块的内容；修改应在对应项目仓库完成。
 - 子模块中的 Skill 需要同步到 `skills/` 后再从本仓库发布。
-- 对已有同步脚本的 Skill，运行 `package.json` 中对应的 `sync:*` 或 `update:*` 命令，不直接修改生成内容。
+- 外部 Skill 的子模块和源路径统一登记在 `skills.config.json`。
+- 对外部 Skill，运行 `pnpm run sync -- <skill-name>` 或 `pnpm run update -- <skill-name>`，不直接修改生成内容。
 
 ## Git 提交
 

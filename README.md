@@ -12,6 +12,7 @@
 ├── sources/               # 通过 Git submodule 引用的其他项目
 ├── scripts/               # Skill 同步脚本
 ├── .gitmodules            # 子模块来源配置
+├── skills.config.json     # 外部 Skill 同步配置
 ├── package.json           # 项目命令入口
 ├── pnpm-lock.yaml         # pnpm 依赖锁文件
 └── AGENTS.md              # 仓库维护约定
@@ -33,29 +34,36 @@ pnpm run sources:init
 `.gitmodules` 用于聚合其他项目的 Skill 源码。需要通过 `skills` CLI
 发布的 Skill，应同步到主仓库的 `skills/<skill-name>/` 并提交；安装器通常不会递归拉取子模块。
 
-## 更新 agent-git
+## 同步外部 Skills
 
-`agent-git` 的源码来自 `sources/agent-git` 子模块，发布副本位于
-`skills/agent-git`。
+外部 Skill 的子模块和源路径统一配置在 `skills.config.json`，发布副本位于
+`skills/<skill-name>`。
 
-同步当前锁定版本：
-
-```bash
-pnpm run sync:agent-git
-```
-
-更新到源仓库 `main` 的最新提交并同步：
+同步所有 Skill 的当前锁定版本：
 
 ```bash
-pnpm run update:agent-git
+pnpm run sync
 ```
 
-更新后需要同时提交子模块指针和 `skills/agent-git` 的内容。
+更新所有子模块到 `main` 的最新提交并同步：
+
+```bash
+pnpm run update
+```
+
+只处理指定 Skill 时，在命令后传入名称：
+
+```bash
+pnpm run sync -- <skill-name>
+pnpm run update -- <skill-name>
+```
+
+更新后需要同时提交子模块指针和对应 `skills/<skill-name>` 的内容。
 
 ## 检查与安装
 
 ```bash
-# 同步所有发布副本并检查 Skill 发现结果
+# 检查 Skill 发现结果，不修改文件
 pnpm run check
 
 # 仅查看能够发现的 Skill
