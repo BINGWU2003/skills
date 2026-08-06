@@ -65,7 +65,11 @@ async function syncSkill(skillName, config, shouldUpdate) {
 
   await rm(destinationPath, { recursive: true, force: true });
   await mkdir(path.dirname(destinationPath), { recursive: true });
-  await cp(sourcePath, destinationPath, { recursive: true, force: true });
+  await cp(sourcePath, destinationPath, {
+    recursive: true,
+    force: true,
+    filter: candidatePath => !['.git', '.gitignore'].includes(path.basename(candidatePath)),
+  });
 
   const sourceCommit = runGit(['-C', submodulePath, 'rev-parse', '--short', 'HEAD']);
   console.log(`已从 ${skillName}@${sourceCommit} 同步到 skills/${skillName}。`);

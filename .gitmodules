@@ -10,3 +10,9 @@
 [submodule "sources/mattpocock-skills"]
 	path = sources/mattpocock-skills
 	url = https://github.com/mattpocock/skills.git
+[submodule "sources/excalidraw-diagram-skill"]
+	path = sources/excalidraw-diagram-skill
+	url = https://github.com/coleam00/excalidraw-diagram-skill.git
+[submodule "sources/drawio-skill"]
+	path = sources/drawio-skill
+	url = https://github.com/Agents365-ai/drawio-skill.git
