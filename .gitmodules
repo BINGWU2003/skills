@@ -7,3 +7,6 @@
 	path = sources/weekly-git-report
 	url = https://github.com/BINGWU2003/weekly-git-report.git
 	branch = main
+[submodule "sources/mattpocock-skills"]
+	path = sources/mattpocock-skills
+	url = https://github.com/mattpocock/skills.git

@@ -8,8 +8,10 @@
 | Skill | 用途 |
 | --- | --- |
 | [`agent-git`](skills/agent-git/) | 使用 checkpoint、status、undo 和 squash 工作流，帮助 Agent 安全管理 Git 修改。 |
-| [`weekly-git-report`](skills/weekly-git-report/) | 根据 Git 提交记录生成、整理或保存周报。 |
+| [`grill-me`](skills/grill-me/) | 启动一轮深入访谈，系统梳理计划、设计或决策中的关键问题。 |
+| [`grilling`](skills/grilling/) | 为 `grill-me` 提供可复用的结构化访谈流程。 |
 | [`hello-skills`](skills/hello-skills/) | 验证 Skill 的发现、安装和显式调用流程。 |
+| [`weekly-git-report`](skills/weekly-git-report/) | 根据 Git 提交记录生成、整理或保存周报。 |
 
 ## 快速开始
 
@@ -27,6 +29,12 @@ npx skills add BINGWU2003/skills --skill agent-git
 
 默认安装到当前项目；如需安装到用户级目录，追加 `--global`。也可以把
 `agent-git` 替换为上表中的其他 Skill 名称。
+
+`grill-me` 依赖 `grilling`，安装时需要同时选择两者：
+
+```bash
+npx skills add BINGWU2003/skills --skill grill-me grilling
+```
 
 ## 本地开发
 
