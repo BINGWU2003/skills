@@ -1,0 +1,26 @@
+{
+  "name": "@bingwu2003/skills",
+  "version": "0.0.0",
+  "private": true,
+  "description": "BINGWU2003 的 Agent Skills 聚合仓库",
+  "type": "module",
+  "scripts": {
+    "check": "pnpm run sync && pnpm run skills:list",
+    "skills:add": "skills add",
+    "skills:install": "skills add .",
+    "skills:list": "skills add . --list",
+    "sources:add": "git submodule add",
+    "sources:init": "git submodule update --init --recursive",
+    "sync": "pnpm run sync:agent-git",
+    "sync:agent-git": "node scripts/sync-agent-git.mjs",
+    "update": "pnpm run update:agent-git",
+    "update:agent-git": "node scripts/sync-agent-git.mjs --update"
+  },
+  "devDependencies": {
+    "skills": "1.5.22"
+  },
+  "engines": {
+    "node": ">=22.20.0"
+  },
+  "packageManager": "pnpm@10.34.4"
+}
