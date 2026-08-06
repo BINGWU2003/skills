@@ -8,6 +8,10 @@
 | [`agent-git`](skills/agent-git/) | 使用 checkpoint、status、undo 和 squash 工作流，帮助 Agent 安全管理 Git 修改。 |
 | [`drawio-skill`](skills/drawio-skill/) | 创建 Draw.io 图表，并通过桌面版 CLI 导出 PNG、SVG、PDF 或 JPG。 |
 | [`excalidraw-diagram`](skills/excalidraw-diagram/) | 根据自然语言创建 Excalidraw 图表，并通过渲染检查迭代优化视觉效果。 |
+| [`gitlab-babysit-mr`](skills/gitlab-babysit-mr/) | 持续监控 GitLab MR 流水线，分类失败并在适当时重试或进行轻量修复。 |
+| [`gitlab-mr-description`](skills/gitlab-mr-description/) | 根据分支差异生成或更新符合 GitLab 约定的 MR 描述。 |
+| [`gitlab-pipeline-watch`](skills/gitlab-pipeline-watch/) | 监控 GitLab MR 流水线，并在状态变化时执行对应处理。 |
+| [`glab`](skills/glab/) | 使用 glab CLI 管理 GitLab Issue、MR、流水线以及 REST、GraphQL API。 |
 | [`grill-me`](skills/grill-me/) | 启动一轮深入访谈，系统梳理计划、设计或决策中的关键问题。 |
 | [`grilling`](skills/grilling/) | 为 `grill-me` 提供可复用的结构化访谈流程。 |
 | [`hello-skills`](skills/hello-skills/) | 验证 Skill 的发现、安装和显式调用流程。 |
@@ -32,3 +36,7 @@ npx skills add BINGWU2003/skills --skill grill-me grilling
 
 导出图片时需要安装 draw.io 桌面版，并确保其 CLI 可调用；Graphviz 仅在使用
 可选的自动布局功能时需要。
+
+### GitLab 开发工作流
+
+这 4 个 Skill 均需要安装并认证 GitLab CLI（`glab`）。
