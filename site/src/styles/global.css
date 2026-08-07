@@ -536,6 +536,12 @@ pre,
   padding-top: 54px;
 }
 
+.detail-grid > *,
+.content-section,
+.prose {
+  min-width: 0;
+}
+
 .content-section + .content-section {
   margin-top: 64px;
 }
@@ -554,6 +560,7 @@ pre,
   color: #c7c7c7;
   font-size: 15px;
   line-height: 1.75;
+  overflow-wrap: anywhere;
 }
 
 .prose > :first-child {
@@ -628,6 +635,7 @@ pre,
 
 .prose code:not(pre code) {
   padding: 2px 5px;
+  overflow-wrap: anywhere;
   border: 1px solid var(--border);
   border-radius: 4px;
   background: var(--surface);
@@ -654,8 +662,16 @@ pre,
   color: var(--muted);
 }
 
-.prose table {
+.prose .table-scroll {
+  max-width: 100%;
+  margin-block: 18px;
+  overflow-x: auto;
+}
+
+.prose .table-scroll table {
   width: 100%;
+  min-width: 100%;
+  margin: 0;
   border-collapse: collapse;
   font-size: 13px;
 }
@@ -904,12 +920,12 @@ pre,
   }
 
   .search-result a,
-  .detail-actions,
-  .detail-grid {
+  .detail-actions {
     grid-template-columns: 1fr;
   }
 
   .detail-grid {
+    grid-template-columns: minmax(0, 1fr);
     gap: 56px;
   }
 

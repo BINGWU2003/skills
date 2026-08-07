@@ -69,6 +69,11 @@ export function renderMarkdown(markdown: string, options: RenderOptions): { html
     return `<h${depth} id="${id}">${text}<a class="heading-anchor" href="#${id}" aria-label="链接到 ${plainText}">#</a></h${depth}>`;
   };
 
+  const renderTable = renderer.table;
+  renderer.table = function (token) {
+    return `<div class="table-scroll">${renderTable.call(this, token)}</div>`;
+  };
+
   const rendered = marked.parser(tokens, { renderer, gfm: true });
   const html = sanitizeHtml(String(rendered), {
     allowedTags: [
