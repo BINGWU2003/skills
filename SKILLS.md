@@ -12,20 +12,11 @@
 | [`gitlab-mr-description`](skills/gitlab-mr-description/) | 根据分支差异生成或更新符合 GitLab 约定的 MR 描述。 |
 | [`gitlab-pipeline-watch`](skills/gitlab-pipeline-watch/) | 监控 GitLab MR 流水线，并在状态变化时执行对应处理。 |
 | [`glab`](skills/glab/) | 使用 glab CLI 管理 GitLab Issue、MR、流水线以及 REST、GraphQL API。 |
-| [`grill-me`](skills/grill-me/) | 启动一轮深入访谈，系统梳理计划、设计或决策中的关键问题。 |
-| [`grilling`](skills/grilling/) | 为 `grill-me` 提供可复用的结构化访谈流程。 |
+| [`grilling`](skills/grilling/) | 通过结构化的深入访谈，系统梳理计划、设计或决策中的关键问题。 |
 | [`hello-skills`](skills/hello-skills/) | 验证 Skill 的发现、安装和显式调用流程。 |
 | [`weekly-git-report`](skills/weekly-git-report/) | 根据 Git 提交记录生成、整理或保存周报。 |
 
 ## 特殊安装与依赖
-
-### `grill-me`
-
-`grill-me` 依赖 `grilling`，安装时需要同时选择两者：
-
-```bash
-npx skills add BINGWU2003/skills --skill grill-me grilling
-```
 
 ### `excalidraw-diagram`
 

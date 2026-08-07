@@ -157,3 +157,19 @@ pnpm run site:check
 GitHub Actions 会在 push 和 PR 上执行构建校验；Netlify 连接仓库后根据根目录的
 `netlify.toml` 构建并发布。外部 Skill 的安装依赖和运行要求使用
 `skills.config.json` 中的可选 `skillDependencies` 与 `requirements` 字段维护。
+
+## 脚本测试
+
+仓库使用 Vitest 测试 `scripts/` 下的维护脚本。测试只操作临时目录和临时 Git
+仓库，不会同步、删除或修改真实的 Skill 来源与发布目录。
+
+```bash
+# 运行全部脚本测试
+pnpm test
+
+# 运行测试并逐文件检查覆盖率
+pnpm run test:coverage
+```
+
+每个脚本的行覆盖率与函数覆盖率不得低于 90%，分支覆盖率不得低于 80%。
+GitHub Actions 会在 Ubuntu 和 Windows 上执行覆盖率检查。

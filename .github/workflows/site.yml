@@ -15,10 +15,44 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  test:
+    name: 脚本测试（${{ matrix.os }}）
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22.20.0"
+          cache: pnpm
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 运行脚本测试与覆盖率检查
+        run: pnpm run test:coverage
+
   check:
     name: 构建与校验
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    needs: test
 
     steps:
       - name: 检出仓库

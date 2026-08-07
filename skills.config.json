@@ -28,13 +28,6 @@
       }
     ]
   },
-  "grill-me": {
-    "submodule": "sources/mattpocock-skills",
-    "skillPath": "skills/productivity/grill-me",
-    "skillDependencies": [
-      "grilling"
-    ]
-  },
   "grilling": {
     "submodule": "sources/mattpocock-skills",
     "skillPath": "skills/productivity/grilling"
