@@ -1,4 +1,4 @@
-# HJC Skills
+# BINGWU Skills
 
 个人 Agent Skills 聚合仓库。这里集中维护可复用的 Skill，并通过统一的
 `skills/` 发布目录供 [`skills`](https://skills.sh/) CLI 发现和安装。
