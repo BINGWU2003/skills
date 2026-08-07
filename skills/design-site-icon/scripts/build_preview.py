@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import re
 import sys
+from urllib.parse import quote
 
 
 HEX_COLOR = re.compile(r"^#[0-9a-f]{3,8}$", re.IGNORECASE)
@@ -46,6 +47,29 @@ def render_frame(relative_source: str, tone: str, label: str) -> str:
   </figure>'''
 
 
+def render_size_strip(relative_source: str) -> str:
+    source = html.escape(relative_source, quote=True)
+    samples = "\n".join(
+        f'''<figure class="size-sample">
+      <img src="{source}" width="{size}" height="{size}" alt="" />
+      <figcaption>{size}px</figcaption>
+    </figure>'''
+        for size in (24, 32, 48)
+    )
+    return f'''<div class="size-strip" aria-label="小尺寸静态检查">
+    {samples}
+  </div>'''
+
+
+def static_svg_data_uri(source: str) -> str:
+    override = '''<style>
+    * { animation: none !important; }
+    path { opacity: 1 !important; stroke-dasharray: none !important; stroke-dashoffset: 0 !important; }
+  </style>'''
+    static_source = source.replace("</svg>", f"{override}\n</svg>")
+    return f"data:image/svg+xml;charset=utf-8,{quote(static_source)}"
+
+
 def render_card(candidate: dict[str, str], theme: str) -> str:
     frames: list[str] = []
     if theme != "light":
@@ -58,6 +82,7 @@ def render_card(candidate: dict[str, str], theme: str) -> str:
     return f'''<article class="card">
     <h2>{title}</h2>
     <div class="frames">{chr(10).join(frames)}</div>
+    {render_size_strip(candidate["static_source"])}
     <code>{file_name}</code>
   </article>'''
 
@@ -95,6 +120,7 @@ def build_preview(args: argparse.Namespace) -> int:
                 "file_name": svg_file.name,
                 "title": extract_title(source, svg_file.stem),
                 "relative_source": relative_source,
+                "static_source": static_svg_data_uri(source),
             }
         )
 
@@ -120,7 +146,11 @@ def build_preview(args: argparse.Namespace) -> int:
     .frame.dark {{ background: {args.dark_background}; }}
     .frame.light {{ background: {args.light_background}; }}
     .frame img {{ width: 58%; height: 58%; object-fit: contain; }}
-    figcaption {{ position: absolute; right: 8px; bottom: 7px; padding: 3px 6px; border-radius: 999px; background: rgb(0 0 0 / .62); color: #fff; font-size: 10px; }}
+    .frame figcaption {{ position: absolute; right: 8px; bottom: 7px; padding: 3px 6px; border-radius: 999px; background: rgb(0 0 0 / .62); color: #fff; font-size: 10px; }}
+    .size-strip {{ display: flex; align-items: end; justify-content: center; gap: 22px; min-height: 92px; margin-top: 10px; padding: 12px; border-radius: 12px; background: {args.dark_background}; }}
+    .size-sample {{ display: grid; place-items: center; gap: 6px; margin: 0; }}
+    .size-sample img {{ display: block; object-fit: contain; }}
+    .size-sample figcaption {{ color: #a1a1aa; font-size: 10px; }}
     code {{ display: block; margin-top: 12px; color: #a1a1aa; overflow-wrap: anywhere; }}
     @media (max-width: 600px) {{ body {{ padding: 20px; }} }}
   </style>

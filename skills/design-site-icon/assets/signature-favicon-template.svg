@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Handwritten favicon template</title>
+  <desc id="desc">A static simplified version of an original signature-style pen exercise.</desc>
+  <style>
+    :root { color: #111827; }
+    @media (prefers-color-scheme: dark) { :root { color: #f5f5f5; } }
+  </style>
+  <!-- Replace every path with a simplified version of the selected logo. -->
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke-width="28" d="M88 326 C126 298 140 223 183 206 C218 193 230 232 208 259 C184 289 151 311 165 342 C183 382 244 343 268 303 C294 260 321 224 350 230 C376 236 369 278 348 310 C330 338 329 361 369 354 C387 351 399 342 417 326" />
+    <path stroke-width="19" opacity=".68" d="M126 378 C206 400 307 389 399 347" />
+  </g>
+</svg>
