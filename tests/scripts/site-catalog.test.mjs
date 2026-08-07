@@ -93,7 +93,9 @@ describe('site-catalog helpers', () => {
     await writeFile(path.join(root, 'skills.config.json'), '{}');
     expect(findRepositoryRoot(root, path.join(root, 'scripts', 'x.mjs'))).toBe(root);
     expect(findRepositoryRoot(child, path.join(root, 'elsewhere', 'x.mjs'))).toBe(root);
-    expect(siteRepositoryRoot()).toMatch(/skills$/);
+    const repositoryRoot = siteRepositoryRoot();
+    expect(path.isAbsolute(repositoryRoot)).toBe(true);
+    expect(findRepositoryRoot(repositoryRoot, path.join(repositoryRoot, 'scripts', 'x.mjs'))).toBe(repositoryRoot);
     const emptyRoot = await temporaryDirectory();
     expect(() => findRepositoryRoot(
       path.join(emptyRoot, 'missing', 'deep'),
