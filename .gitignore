@@ -4,6 +4,7 @@
 node_modules/
 *.log
 temp/
+coverage/
 site/dist/
 site/.astro/
 site/public/downloads/

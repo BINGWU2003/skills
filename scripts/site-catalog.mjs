@@ -1,16 +1,16 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { readFile, stat } from 'node:fs/promises';
+import { lstat, readFile, realpath, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import matter from 'gray-matter';
 
-function findRepositoryRoot() {
+export function findRepositoryRoot(cwd = process.cwd(), modulePath = fileURLToPath(import.meta.url)) {
   const candidates = [
-    process.cwd(),
-    path.resolve(process.cwd(), '..'),
-    path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'),
+    cwd,
+    path.resolve(cwd, '..'),
+    path.resolve(path.dirname(modulePath), '..'),
   ];
   const root = candidates.find(candidate => existsSync(path.join(candidate, 'skills.config.json')));
   if (!root) {
@@ -19,7 +19,7 @@ function findRepositoryRoot() {
   return root;
 }
 
-const repoRoot = findRepositoryRoot();
+const defaultRepoRoot = findRepositoryRoot();
 const textExtensions = new Set([
   '.css', '.csv', '.html', '.ini', '.js', '.json', '.jsx', '.md', '.mjs',
   '.ps1', '.py', '.sh', '.sql', '.toml', '.ts', '.tsx', '.txt', '.xml',
@@ -27,15 +27,25 @@ const textExtensions = new Set([
 ]);
 const imageExtensions = new Set(['.avif', '.gif', '.jpeg', '.jpg', '.png', '.webp']);
 
-function runGit(args, options = {}) {
-  const result = spawnSync('git', args, {
-    cwd: repoRoot,
-    encoding: 'utf8',
-    ...options,
-  });
+export function runGit(args, options = {}) {
+  const { repoRoot = defaultRepoRoot, allowFailure = false, ...spawnOptions } = options;
+  let result;
+  try {
+    result = spawnSync('git', args, {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      ...spawnOptions,
+    });
+  }
+  catch (error) {
+    if (allowFailure) {
+      return '';
+    }
+    throw error;
+  }
 
   if (result.error || result.status !== 0) {
-    if (options.allowFailure) {
+    if (allowFailure) {
       return '';
     }
     throw result.error ?? new Error(`Git 命令执行失败：git ${args.join(' ')}`);
@@ -44,7 +54,7 @@ function runGit(args, options = {}) {
   return result.stdout?.trim() ?? '';
 }
 
-function parseGitmodules(source) {
+export function parseGitmodules(source) {
   const modules = new Map();
   let current = null;
 
@@ -73,7 +83,7 @@ function parseGitmodules(source) {
   return modules;
 }
 
-function repositoryWebUrl(gitUrl) {
+export function repositoryWebUrl(gitUrl) {
   if (!gitUrl) {
     return null;
   }
@@ -86,7 +96,7 @@ function repositoryWebUrl(gitUrl) {
   return gitUrl.replace(/^git:\/\//, 'https://').replace(/\.git$/, '');
 }
 
-function directoryPermalink(repositoryUrl, commit, directory) {
+export function directoryPermalink(repositoryUrl, commit, directory) {
   if (!repositoryUrl || !commit) {
     return repositoryUrl;
   }
@@ -98,7 +108,7 @@ function directoryPermalink(repositoryUrl, commit, directory) {
   return `${repositoryUrl}/tree/${commit}${normalizedPath}`;
 }
 
-function classifyFile(filePath, size) {
+export function classifyFile(filePath, size) {
   const extension = path.posix.extname(filePath).toLowerCase();
   if (imageExtensions.has(extension)) {
     return { kind: 'image', previewable: true };
@@ -109,46 +119,73 @@ function classifyFile(filePath, size) {
   return { kind: 'binary', previewable: false };
 }
 
-function assertSafeRelativePath(candidate, label) {
+export function assertSafeRelativePath(candidate, label) {
   const normalized = path.posix.normalize(candidate.replaceAll('\\', '/'));
-  if (normalized === '..' || normalized.startsWith('../') || path.posix.isAbsolute(normalized)) {
+  if (
+    normalized === '..'
+    || normalized.startsWith('../')
+    || path.posix.isAbsolute(normalized)
+    || /^[A-Za-z]:\//.test(normalized)
+  ) {
     throw new Error(`${label}超出 Skill 目录：${candidate}`);
   }
   return normalized;
 }
 
-function simpleMetadata(frontmatter) {
+export function simpleMetadata(frontmatter) {
   const omitted = new Set(['name', 'description']);
   return Object.entries(frontmatter)
     .filter(([key, value]) => !omitted.has(key) && value !== undefined && value !== null)
     .map(([key, value]) => ({ key, value }));
 }
 
-async function readTrackedSkillFiles() {
-  const output = runGit(['ls-files', '-z', '--', 'skills']);
-  return output.split('\0').filter(Boolean).map(file => file.replaceAll('\\', '/'));
+export function assertInside(parentPath, childPath, label) {
+  const relativePath = path.relative(parentPath, childPath);
+  if (relativePath === '..' || relativePath.startsWith(`..${path.sep}`) || path.isAbsolute(relativePath)) {
+    throw new Error(`${label}超出 Skill 目录：${childPath}`);
+  }
 }
 
-async function readTextForSearch(absolutePath, size) {
+export async function readTrackedSkillFiles(
+  repoRoot = defaultRepoRoot,
+  runGitCommand = args => runGit(args, { repoRoot }),
+  fileExists = existsSync,
+) {
+  const output = runGitCommand(['ls-files', '-z', '--', 'skills']);
+  return output
+    .split('\0')
+    .filter(Boolean)
+    .map(file => file.replaceAll('\\', '/'))
+    .filter(file => fileExists(path.join(repoRoot, ...file.split('/'))));
+}
+
+export async function readTextForSearch(absolutePath, size, readTextFile = readFile) {
   if (size > 512 * 1024 || !textExtensions.has(path.extname(absolutePath).toLowerCase())) {
     return '';
   }
-  return readFile(absolutePath, 'utf8');
+  return readTextFile(absolutePath, 'utf8');
 }
 
 export function siteRepositoryRoot() {
-  return repoRoot;
+  return defaultRepoRoot;
 }
 
-export async function loadCatalog() {
+export async function loadCatalog(options = {}) {
+  const repoRoot = options.repoRoot ?? defaultRepoRoot;
+  const readTextFile = options.readTextFile ?? readFile;
+  const statPath = options.statPath ?? stat;
+  const lstatPath = options.lstatPath ?? lstat;
+  const resolveRealPath = options.resolveRealPath ?? realpath;
+  const runGitCommand = options.runGitCommand
+    ?? ((args, gitOptions) => runGit(args, { repoRoot, ...gitOptions }));
   const [trackedFiles, configSource, gitmodulesSource] = await Promise.all([
-    readTrackedSkillFiles(),
-    readFile(path.join(repoRoot, 'skills.config.json'), 'utf8'),
-    readFile(path.join(repoRoot, '.gitmodules'), 'utf8'),
+    readTrackedSkillFiles(repoRoot, runGitCommand, options.fileExists ?? existsSync),
+    readTextFile(path.join(repoRoot, 'skills.config.json'), 'utf8'),
+    readTextFile(path.join(repoRoot, '.gitmodules'), 'utf8'),
   ]);
   const config = JSON.parse(configSource);
   const gitmodules = parseGitmodules(gitmodulesSource);
-  const originUrl = repositoryWebUrl(runGit(['remote', 'get-url', 'origin'], { allowFailure: true }))
+  const originUrl = repositoryWebUrl(runGitCommand(['remote', 'get-url', 'origin'], { allowFailure: true }))
     ?? 'https://github.com/BINGWU2003/skills';
   const filesBySkill = new Map();
 
@@ -171,7 +208,7 @@ export async function loadCatalog() {
     }
 
     const skillFilePath = path.join(repoRoot, ...skillEntry.trackedFile.split('/'));
-    const skillSource = await readFile(skillFilePath, 'utf8');
+    const skillSource = await readTextFile(skillFilePath, 'utf8');
     const parsed = matter(skillSource);
     if (parsed.data.name !== skillName) {
       throw new Error(`Skill 名称不一致：skills/${skillName}/SKILL.md 声明为 ${parsed.data.name ?? '空'}`);
@@ -185,9 +222,14 @@ export async function loadCatalog() {
     for (const entry of trackedEntries.sort((a, b) => a.relativePath.localeCompare(b.relativePath))) {
       const safePath = assertSafeRelativePath(entry.relativePath, `${skillName} 文件路径`);
       const absolutePath = path.join(repoRoot, ...entry.trackedFile.split('/'));
-      const fileStat = await stat(absolutePath);
+      const linkStat = await lstatPath(absolutePath);
+      if (linkStat.isSymbolicLink()) {
+        const resolvedPath = await resolveRealPath(absolutePath);
+        assertInside(path.join(repoRoot, 'skills', skillName), resolvedPath, `${skillName} 符号链接`);
+      }
+      const fileStat = await statPath(absolutePath);
       const classification = classifyFile(safePath, fileStat.size);
-      const searchText = await readTextForSearch(absolutePath, fileStat.size);
+      const searchText = await readTextForSearch(absolutePath, fileStat.size, readTextFile);
       if (searchText) {
         searchableParts.push(safePath, searchText);
       }
@@ -202,7 +244,8 @@ export async function loadCatalog() {
     const skillConfig = config[skillName] ?? {};
     const skillDependencies = skillConfig.skillDependencies ?? [];
     for (const dependency of skillDependencies) {
-      if (!filesBySkill.has(dependency)) {
+      const dependencyEntries = filesBySkill.get(dependency);
+      if (!dependencyEntries?.some(entry => entry.relativePath === 'SKILL.md')) {
         throw new Error(`${skillName} 引用了不存在的 Skill 依赖：${dependency}`);
       }
     }
@@ -227,9 +270,9 @@ export async function loadCatalog() {
         throw new Error(`${skillName} 的子模块未登记在 .gitmodules：${skillConfig.submodule}`);
       }
       const repositoryUrl = repositoryWebUrl(module.url);
-      const treeEntry = runGit(['ls-tree', 'HEAD', '--', skillConfig.submodule], { allowFailure: true });
+      const treeEntry = runGitCommand(['ls-tree', 'HEAD', '--', skillConfig.submodule], { allowFailure: true });
       const pinnedCommit = treeEntry.split(/\s+/)[2] ?? '';
-      const commit = runGit(['-C', path.join(repoRoot, skillConfig.submodule), 'rev-parse', 'HEAD'], { allowFailure: true })
+      const commit = runGitCommand(['-C', path.join(repoRoot, skillConfig.submodule), 'rev-parse', 'HEAD'], { allowFailure: true })
         || pinnedCommit;
       if (!commit) {
         throw new Error(`无法获取 ${skillName} 的上游提交：${skillConfig.submodule}`);
@@ -241,7 +284,7 @@ export async function loadCatalog() {
       };
     }
 
-    const updatedAt = runGit(['log', '-1', '--format=%cI', '--', `skills/${skillName}`], { allowFailure: true }) || null;
+    const updatedAt = runGitCommand(['log', '-1', '--format=%cI', '--', `skills/${skillName}`], { allowFailure: true }) || null;
     skills.push({
       name: skillName,
       description: parsed.data.description.trim(),

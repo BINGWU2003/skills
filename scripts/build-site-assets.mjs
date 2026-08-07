@@ -1,28 +1,35 @@
 #!/usr/bin/env node
 
 import { createWriteStream } from 'node:fs';
-import { copyFile, mkdir, rm } from 'node:fs/promises';
+import { copyFile, mkdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { ZipArchive } from 'archiver';
 
 import { loadCatalog, siteRepositoryRoot } from './site-catalog.mjs';
 
-const repoRoot = siteRepositoryRoot();
-const publicRoot = path.resolve(repoRoot, 'site', 'public');
-const downloadsRoot = path.resolve(publicRoot, 'downloads');
+const scriptPath = fileURLToPath(import.meta.url);
+const defaultRepoRoot = siteRepositoryRoot();
 
-function assertInside(parentPath, childPath, label) {
+export function assertInside(parentPath, childPath, label) {
   const relativePath = path.relative(parentPath, childPath);
-  if (!relativePath || relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+  if (
+    !relativePath
+    || relativePath === '..'
+    || relativePath.startsWith(`..${path.sep}`)
+    || path.isAbsolute(relativePath)
+  ) {
     throw new Error(`${label}超出允许范围：${childPath}`);
   }
 }
 
-async function createSkillZip(skill, destinationPath) {
+export async function createSkillZip(skill, destinationPath, options = {}) {
+  const createOutput = options.createOutput ?? createWriteStream;
+  const Archive = options.Archive ?? ZipArchive;
   await new Promise((resolve, reject) => {
-    const output = createWriteStream(destinationPath);
-    const archive = new ZipArchive({ zlib: { level: 9 } });
+    const output = createOutput(destinationPath);
+    const archive = new Archive({ zlib: { level: 9 } });
     output.on('close', resolve);
     output.on('error', reject);
     archive.on('error', reject);
@@ -34,12 +41,34 @@ async function createSkillZip(skill, destinationPath) {
   });
 }
 
-async function main() {
-  assertInside(publicRoot, downloadsRoot, '下载目录');
-  await rm(downloadsRoot, { recursive: true, force: true });
-  await mkdir(downloadsRoot, { recursive: true });
+export function buildSearchIndexEntry(skill) {
+  return {
+    name: skill.name,
+    description: skill.description,
+    updatedAt: skill.updatedAt,
+    source: skill.upstream?.repositoryUrl ?? skill.publishedSourceUrl,
+    filePaths: skill.files.map(file => file.path),
+    text: skill.searchText,
+  };
+}
 
-  const skills = await loadCatalog();
+export async function main(options = {}) {
+  const repoRoot = options.repoRoot ?? defaultRepoRoot;
+  const publicRoot = options.publicRoot ?? path.resolve(repoRoot, 'site', 'public');
+  const downloadsRoot = options.downloadsRoot ?? path.resolve(publicRoot, 'downloads');
+  const removePath = options.removePath ?? rm;
+  const makeDirectory = options.makeDirectory ?? mkdir;
+  const copyPath = options.copyPath ?? copyFile;
+  const writeTextFile = options.writeTextFile ?? writeFile;
+  const loadCatalogFn = options.loadCatalogFn ?? loadCatalog;
+  const createZip = options.createZip ?? createSkillZip;
+  const logger = options.logger ?? console;
+
+  assertInside(publicRoot, downloadsRoot, '下载目录');
+  await removePath(downloadsRoot, { recursive: true, force: true });
+  await makeDirectory(downloadsRoot, { recursive: true });
+
+  const skills = await loadCatalogFn(options.catalogOptions);
   const searchIndex = [];
   for (const skill of skills) {
     const skillDownloadRoot = path.join(downloadsRoot, 'skills', skill.name);
@@ -47,32 +76,33 @@ async function main() {
     for (const file of skill.files) {
       const destination = path.join(skillDownloadRoot, ...file.path.split('/'));
       assertInside(skillDownloadRoot, destination, `${skill.name} 下载文件`);
-      await mkdir(path.dirname(destination), { recursive: true });
-      await copyFile(file.absolutePath, destination);
+      await makeDirectory(path.dirname(destination), { recursive: true });
+      await copyPath(file.absolutePath, destination);
     }
 
-    await createSkillZip(skill, path.join(downloadsRoot, `${skill.name}.zip`));
-    searchIndex.push({
-      name: skill.name,
-      description: skill.description,
-      updatedAt: skill.updatedAt,
-      source: skill.upstream?.repositoryUrl ?? skill.publishedSourceUrl,
-      filePaths: skill.files.map(file => file.path),
-      text: skill.searchText,
-    });
+    await createZip(skill, path.join(downloadsRoot, `${skill.name}.zip`));
+    searchIndex.push(buildSearchIndexEntry(skill));
   }
 
-  await mkdir(publicRoot, { recursive: true });
-  await import('node:fs/promises').then(({ writeFile }) => writeFile(
+  await makeDirectory(publicRoot, { recursive: true });
+  await writeTextFile(
     path.join(publicRoot, 'search-index.json'),
     `${JSON.stringify(searchIndex)}\n`,
     'utf8',
-  ));
+  );
 
-  console.log(`已生成 ${skills.length} 个 Skill 的下载文件与搜索索引。`);
+  logger.log(`已生成 ${skills.length} 个 Skill 的下载文件与搜索索引。`);
 }
 
-main().catch(error => {
-  console.error(error.message);
-  process.exitCode = 1;
-});
+export function isDirectExecution(argvPath = process.argv[1]) {
+  return Boolean(argvPath) && path.resolve(argvPath) === path.resolve(scriptPath);
+}
+
+/* v8 ignore start -- CLI bootstrap is covered through exported main() */
+if (isDirectExecution()) {
+  main().catch(error => {
+    console.error(error.message);
+    process.exitCode = 1;
+  });
+}
+/* v8 ignore stop */
