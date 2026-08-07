@@ -1,0 +1,202 @@
+---
+import InstallCommand from '../components/InstallCommand.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { formatDate, skillHref } from '../lib/paths';
+import { loadCatalog } from '../../../scripts/site-catalog.mjs';
+
+const skills = await loadCatalog();
+const latestUpdate = skills
+  .map(skill => skill.updatedAt)
+  .filter(Boolean)
+  .sort()
+  .at(-1) ?? null;
+---
+
+<BaseLayout>
+  <main class="page-shell">
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <p class="eyebrow">Personal Agent Skills Collection</p>
+        <h1 class="hero-title" id="hero-title">BINGWU<span>/ SKILLS</span></h1>
+      </div>
+      <div>
+        <p class="hero-copy">浏览、搜索并安装我日常使用的 Agent Skills。</p>
+        <div class="hero-actions">
+          <p class="section-label">Try it now</p>
+          <InstallCommand command="npx skills add BINGWU2003/skills" label="仓库安装命令" />
+        </div>
+      </div>
+    </section>
+
+    <section class="catalog-section" aria-labelledby="catalog-title" data-catalog data-base={import.meta.env.BASE_URL}>
+      <div class="catalog-header">
+        <h2 class="table-heading" id="catalog-title">Skills Directory</h2>
+        <span class="catalog-count">{skills.length} SKILLS · UPDATED {formatDate(latestUpdate)}</span>
+      </div>
+
+      <label class="search-box">
+        <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+        <span class="sr-only">搜索 Skills</span>
+        <input type="search" placeholder="搜索名称、简介、正文或文件路径…" autocomplete="off" data-search-input />
+        <span class="shortcut" aria-hidden="true">/</span>
+      </label>
+
+      <div class="sort-tabs" aria-label="排序方式">
+        <button type="button" data-sort="name" aria-pressed="true">名称</button>
+        <button type="button" data-sort="updated" aria-pressed="false">最近更新</button>
+      </div>
+
+      <table class="skill-table" data-skill-table>
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Skill</th>
+            <th scope="col">Updated</th>
+          </tr>
+        </thead>
+        <tbody data-skill-rows>
+          {skills.map((skill, index) => (
+            <tr class="skill-row" data-name={skill.name} data-updated={skill.updatedAt ?? ''}>
+              <td class="row-index">{String(index + 1).padStart(2, '0')}</td>
+              <td>
+                <a class="skill-link" href={skillHref(skill.name)}>
+                  <span class="skill-name">{skill.name}</span>
+                  <span class="skill-description">{skill.description}</span>
+                </a>
+              </td>
+              <td class="updated-cell">{formatDate(skill.updatedAt)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <ul class="search-results" data-search-results aria-live="polite"></ul>
+      <div class="empty-state" data-empty-state hidden>没有找到匹配的 Skill。</div>
+    </section>
+  </main>
+
+  <script>
+    type SearchEntry = {
+      name: string;
+      description: string;
+      updatedAt: string | null;
+      source: string;
+      filePaths: string[];
+      text: string;
+    };
+
+    const catalog = document.querySelector<HTMLElement>('[data-catalog]');
+    const input = catalog?.querySelector<HTMLInputElement>('[data-search-input]');
+    const table = catalog?.querySelector<HTMLElement>('[data-skill-table]');
+    const rowsRoot = catalog?.querySelector<HTMLElement>('[data-skill-rows]');
+    const resultsRoot = catalog?.querySelector<HTMLUListElement>('[data-search-results]');
+    const emptyState = catalog?.querySelector<HTMLElement>('[data-empty-state]');
+    const sortButtons = [...(catalog?.querySelectorAll<HTMLButtonElement>('[data-sort]') ?? [])];
+    const rows = [...(rowsRoot?.querySelectorAll<HTMLTableRowElement>('[data-name]') ?? [])];
+    const base = catalog?.dataset.base ?? '/';
+    let indexPromise: Promise<SearchEntry[]> | null = null;
+
+    function loadIndex() {
+      indexPromise ??= fetch(`${base}search-index.json`).then(response => {
+        if (!response.ok) throw new Error('搜索索引加载失败');
+        return response.json() as Promise<SearchEntry[]>;
+      });
+      return indexPromise;
+    }
+
+    function normalized(value: string) {
+      return value.toLocaleLowerCase('zh-CN');
+    }
+
+    function score(entry: SearchEntry, terms: string[]) {
+      const name = normalized(entry.name);
+      const description = normalized(entry.description);
+      const paths = normalized(entry.filePaths.join(' '));
+      const text = normalized(entry.text);
+      let total = 0;
+      for (const term of terms) {
+        if (!text.includes(term) && !paths.includes(term) && !description.includes(term) && !name.includes(term)) {
+          return -1;
+        }
+        if (name === term) total += 100;
+        else if (name.startsWith(term)) total += 60;
+        else if (name.includes(term)) total += 40;
+        if (description.includes(term)) total += 18;
+        if (paths.includes(term)) total += 10;
+        if (text.includes(term)) total += 4;
+      }
+      return total;
+    }
+
+    function excerpt(entry: SearchEntry, terms: string[]) {
+      const source = `${entry.description}\n${entry.filePaths.join(' · ')}\n${entry.text}`.replace(/\s+/g, ' ').trim();
+      const lower = normalized(source);
+      const positions = terms.map(term => lower.indexOf(term)).filter(position => position >= 0);
+      const hit = positions.length > 0 ? Math.min(...positions) : 0;
+      const start = Math.max(0, hit - 64);
+      const end = Math.min(source.length, hit + 150);
+      return `${start > 0 ? '…' : ''}${source.slice(start, end)}${end < source.length ? '…' : ''}`;
+    }
+
+    function createResult(entry: SearchEntry, terms: string[]) {
+      const item = document.createElement('li');
+      item.className = 'search-result';
+      const link = document.createElement('a');
+      link.href = `${base}skills/${encodeURIComponent(entry.name)}/`;
+      const summary = document.createElement('div');
+      const name = document.createElement('strong');
+      name.textContent = entry.name;
+      const description = document.createElement('p');
+      description.textContent = entry.description;
+      const snippet = document.createElement('div');
+      snippet.className = 'snippet';
+      snippet.textContent = excerpt(entry, terms);
+      summary.append(name, description);
+      link.append(summary, snippet);
+      item.append(link);
+      return item;
+    }
+
+    async function search() {
+      if (!input || !resultsRoot || !table || !emptyState) return;
+      const terms = normalized(input.value).trim().split(/\s+/).filter(Boolean);
+      if (terms.length === 0) {
+        table.hidden = false;
+        resultsRoot.classList.remove('is-visible');
+        resultsRoot.replaceChildren();
+        emptyState.hidden = true;
+        return;
+      }
+
+      const searchIndex = await loadIndex();
+      const matches = searchIndex
+        .map(entry => ({ entry, score: score(entry, terms) }))
+        .filter(match => match.score >= 0)
+        .sort((a, b) => b.score - a.score || a.entry.name.localeCompare(b.entry.name));
+      resultsRoot.replaceChildren(...matches.map(match => createResult(match.entry, terms)));
+      table.hidden = true;
+      resultsRoot.classList.toggle('is-visible', matches.length > 0);
+      emptyState.hidden = matches.length > 0;
+    }
+
+    input?.addEventListener('input', () => void search());
+    document.addEventListener('keydown', event => {
+      const target = event.target as HTMLElement;
+      if (event.key === '/' && !['INPUT', 'TEXTAREA'].includes(target.tagName)) {
+        event.preventDefault();
+        input?.focus();
+      }
+    });
+
+    for (const button of sortButtons) {
+      button.addEventListener('click', () => {
+        const sort = button.dataset.sort;
+        for (const candidate of sortButtons) candidate.setAttribute('aria-pressed', String(candidate === button));
+        const sorted = [...rows].sort((a, b) => sort === 'updated'
+          ? (b.dataset.updated ?? '').localeCompare(a.dataset.updated ?? '') || (a.dataset.name ?? '').localeCompare(b.dataset.name ?? '')
+          : (a.dataset.name ?? '').localeCompare(b.dataset.name ?? ''));
+        rowsRoot?.append(...sorted);
+      });
+    }
+  </script>
+</BaseLayout>

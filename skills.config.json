@@ -5,15 +5,35 @@
   },
   "drawio-skill": {
     "submodule": "sources/drawio-skill",
-    "skillPath": "skills/drawio-skill"
+    "skillPath": "skills/drawio-skill",
+    "requirements": [
+      {
+        "title": "draw.io CLI",
+        "description": "导出 PNG、SVG、PDF 或 JPG 时需要安装 draw.io 桌面版并确保 CLI 可调用。"
+      },
+      {
+        "title": "Graphviz（可选）",
+        "description": "仅在使用自动布局功能时需要。"
+      }
+    ]
   },
   "excalidraw-diagram": {
     "submodule": "sources/excalidraw-diagram-skill",
-    "skillPath": "."
+    "skillPath": ".",
+    "requirements": [
+      {
+        "title": "首次配置",
+        "description": "预览渲染器需要 uv 和 Playwright；安装后请按随附 README 完成配置。",
+        "path": "README.md"
+      }
+    ]
   },
   "grill-me": {
     "submodule": "sources/mattpocock-skills",
-    "skillPath": "skills/productivity/grill-me"
+    "skillPath": "skills/productivity/grill-me",
+    "skillDependencies": [
+      "grilling"
+    ]
   },
   "grilling": {
     "submodule": "sources/mattpocock-skills",
@@ -21,19 +41,47 @@
   },
   "gitlab-babysit-mr": {
     "submodule": "sources/gitlab-ai-skills",
-    "skillPath": "skills/gitlab-babysit-mr"
+    "skillPath": "skills/gitlab-babysit-mr",
+    "requirements": [
+      {
+        "title": "GitLab CLI",
+        "description": "运行前需要安装并认证 glab CLI。",
+        "url": "https://gitlab.com/gitlab-org/cli"
+      }
+    ]
   },
   "gitlab-mr-description": {
     "submodule": "sources/gitlab-ai-skills",
-    "skillPath": "skills/gitlab-mr-description"
+    "skillPath": "skills/gitlab-mr-description",
+    "requirements": [
+      {
+        "title": "GitLab CLI",
+        "description": "运行前需要安装并认证 glab CLI。",
+        "url": "https://gitlab.com/gitlab-org/cli"
+      }
+    ]
   },
   "gitlab-pipeline-watch": {
     "submodule": "sources/gitlab-ai-skills",
-    "skillPath": "skills/gitlab-pipeline-watch"
+    "skillPath": "skills/gitlab-pipeline-watch",
+    "requirements": [
+      {
+        "title": "GitLab CLI",
+        "description": "运行前需要安装并认证 glab CLI。",
+        "url": "https://gitlab.com/gitlab-org/cli"
+      }
+    ]
   },
   "glab": {
     "submodule": "sources/gitlab-ai-skills",
-    "skillPath": "skills/glab"
+    "skillPath": "skills/glab",
+    "requirements": [
+      {
+        "title": "GitLab CLI",
+        "description": "运行前需要安装并认证 glab CLI。",
+        "url": "https://gitlab.com/gitlab-org/cli"
+      }
+    ]
   },
   "weekly-git-report": {
     "submodule": "sources/weekly-git-report",

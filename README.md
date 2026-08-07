@@ -3,6 +3,8 @@
 个人 Agent Skills 聚合仓库。这里集中维护可复用的 Skill，并通过统一的
 `skills/` 发布目录供 [`skills`](https://skills.sh/) CLI 发现和安装。
 
+网站通过 Netlify 部署；首次发布后可将站点地址补充到这里。
+
 ## 可用 Skills
 
 完整清单、用途及特殊安装要求见 [`SKILLS.md`](SKILLS.md)。
@@ -52,6 +54,7 @@ pnpm run sources:init
 │       └── assets/        # 可选：输出素材
 ├── sources/               # 通过 Git submodule 引用的 Skill 来源
 ├── scripts/               # 仓库维护脚本
+├── site/                  # Astro 静态网站源码
 ├── skills.config.json     # 外部 Skill 的来源和同步路径
 ├── .gitmodules            # Git submodule 配置
 └── AGENTS.md              # 仓库维护约定
@@ -137,3 +140,20 @@ pnpm run check
 ```bash
 pnpm run skills:list
 ```
+
+## 网站开发
+
+网站直接读取 Git 已跟踪的 `skills/*/SKILL.md`，并在构建时生成详情页、文件预览、
+搜索索引和单 Skill ZIP，不需要数据库或后端服务。
+
+```bash
+# 启动本地开发服务器
+pnpm run site:dev
+
+# 完整执行 Skill、类型、构建和站内链接检查
+pnpm run site:check
+```
+
+GitHub Actions 会在 push 和 PR 上执行构建校验；Netlify 连接仓库后根据根目录的
+`netlify.toml` 构建并发布。外部 Skill 的安装依赖和运行要求使用
+`skills.config.json` 中的可选 `skillDependencies` 与 `requirements` 字段维护。
