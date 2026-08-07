@@ -16,7 +16,7 @@
     "sync": "node scripts/sync-skills.mjs",
     "update": "node scripts/sync-skills.mjs --update",
     "site:prepare": "node scripts/build-site-assets.mjs",
-    "site:dev": "pnpm run site:prepare && astro dev --root site",
+    "site:dev": "pnpm run site:prepare && astro dev --root site --host",
     "site:build": "pnpm run site:prepare && astro build --root site",
     "site:check": "pnpm run check && pnpm run site:prepare && astro check --root site && astro build --root site && node scripts/check-site-links.mjs"
   },
