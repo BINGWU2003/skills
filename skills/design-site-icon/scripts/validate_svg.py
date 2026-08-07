@@ -52,6 +52,31 @@ def inspect_svg(file_name: Path, source: str) -> list[tuple[str, str]]:
     if re.search(r'''\b(?:href|xlink:href)\s*=\s*["'](?:https?:|//)''', source, re.IGNORECASE):
         add_issue(issues, "error", "包含外部网络资源")
 
+    path_count = len(re.findall(r"<path\b", source, re.IGNORECASE))
+    if path_count < 1:
+        add_issue(issues, "error", "手写线性图标至少需要 1 条 path")
+    elif path_count > 4:
+        add_issue(issues, "error", f"包含 {path_count} 条 path；手写线性风格最多允许 4 条主要路径")
+
+    if re.search(r"<(?:rect|circle|ellipse|polygon|polyline|line)\b", source, re.IGNORECASE):
+        add_issue(issues, "error", "包含基础几何图元；请把图形重画为 1–4 条有机 path")
+    if re.search(r"<(?:linearGradient|radialGradient|filter|mask|clipPath)\b", source, re.IGNORECASE):
+        add_issue(issues, "error", "包含渐变、滤镜或遮罩；手写线性图标应保持简单描边")
+    if not re.search(r'''stroke-linecap\s*=\s*["']round["']''', source, re.IGNORECASE):
+        add_issue(issues, "error", '缺少 stroke-linecap="round"')
+    if not re.search(r'''stroke-linejoin\s*=\s*["']round["']''', source, re.IGNORECASE):
+        add_issue(issues, "error", '缺少 stroke-linejoin="round"')
+
+    fill_values = re.findall(r'''\bfill\s*=\s*["']([^"']+)["']''', source, re.IGNORECASE)
+    if not any(value.strip().lower() == "none" for value in fill_values):
+        add_issue(issues, "error", '缺少 fill="none"；图标必须以描边为主体')
+    if any(value.strip().lower() != "none" for value in fill_values):
+        add_issue(issues, "error", "包含非 none 的填充；默认风格禁止大面积填充")
+
+    colors = {color.lower() for color in re.findall(r"#[0-9a-f]{3,8}\b", source, re.IGNORECASE)}
+    if len(colors) > 2:
+        add_issue(issues, "error", f"包含 {len(colors)} 个十六进制颜色；默认只允许单色或明暗主题双色")
+
     animated = bool(
         re.search(r"@keyframes|\banimation\s*:|<animate(?:Transform|Motion)?\b", source, re.IGNORECASE)
     )

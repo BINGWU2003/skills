@@ -1,4 +1,4 @@
 interface:
-  display_name: "网站图标设计"
-  short_description: "为网站设计原创的静态与动态 SVG Logo 和 favicon"
-  default_prompt: "使用 $design-site-icon 为这个网站调研并设计三组动态 SVG 图标候选。"
+  display_name: "手写线性网站图标"
+  short_description: "设计具有个人签名感的动态线性 SVG Logo 和 favicon"
+  default_prompt: "使用 $design-site-icon 为这个网站设计三组手写签名式动态 SVG 图标候选。"
