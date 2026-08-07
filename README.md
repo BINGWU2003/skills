@@ -3,8 +3,6 @@
 个人 Agent Skills 聚合仓库。这里集中维护可复用的 Skill，并通过统一的
 `skills/` 发布目录供 [`skills`](https://skills.sh/) CLI 发现和安装。
 
-网站通过 Netlify 部署；首次发布后可将站点地址补充到这里。
-
 ## 可用 Skills
 
 完整清单、用途及特殊安装要求见 [`SKILLS.md`](SKILLS.md)。
