@@ -16,6 +16,3 @@
 [submodule "sources/drawio-skill"]
 	path = sources/drawio-skill
 	url = https://github.com/Agents365-ai/drawio-skill.git
-[submodule "sources/gitlab-ai-skills"]
-	path = sources/gitlab-ai-skills
-	url = https://gitlab.com/gitlab-org/ai/skills.git

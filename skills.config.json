@@ -32,50 +32,6 @@
     "submodule": "sources/mattpocock-skills",
     "skillPath": "skills/productivity/grilling"
   },
-  "gitlab-babysit-mr": {
-    "submodule": "sources/gitlab-ai-skills",
-    "skillPath": "skills/gitlab-babysit-mr",
-    "requirements": [
-      {
-        "title": "GitLab CLI",
-        "description": "运行前需要安装并认证 glab CLI。",
-        "url": "https://gitlab.com/gitlab-org/cli"
-      }
-    ]
-  },
-  "gitlab-mr-description": {
-    "submodule": "sources/gitlab-ai-skills",
-    "skillPath": "skills/gitlab-mr-description",
-    "requirements": [
-      {
-        "title": "GitLab CLI",
-        "description": "运行前需要安装并认证 glab CLI。",
-        "url": "https://gitlab.com/gitlab-org/cli"
-      }
-    ]
-  },
-  "gitlab-pipeline-watch": {
-    "submodule": "sources/gitlab-ai-skills",
-    "skillPath": "skills/gitlab-pipeline-watch",
-    "requirements": [
-      {
-        "title": "GitLab CLI",
-        "description": "运行前需要安装并认证 glab CLI。",
-        "url": "https://gitlab.com/gitlab-org/cli"
-      }
-    ]
-  },
-  "glab": {
-    "submodule": "sources/gitlab-ai-skills",
-    "skillPath": "skills/glab",
-    "requirements": [
-      {
-        "title": "GitLab CLI",
-        "description": "运行前需要安装并认证 glab CLI。",
-        "url": "https://gitlab.com/gitlab-org/cli"
-      }
-    ]
-  },
   "weekly-git-report": {
     "submodule": "sources/weekly-git-report",
     "skillPath": "packages/skill/skills/weekly-git-report"
