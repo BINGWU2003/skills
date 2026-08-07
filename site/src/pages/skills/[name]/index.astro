@@ -71,6 +71,18 @@ function fileIcon(kind: string): string {
       )}
     </header>
 
+    <button
+      class="mobile-sidebar-trigger"
+      type="button"
+      aria-controls="skill-info-sidebar"
+      aria-expanded="false"
+      data-mobile-sidebar-open
+    >
+      <i class="ph ph-list" aria-hidden="true"></i>
+      页面信息
+    </button>
+    <div class="mobile-sidebar-backdrop" data-mobile-sidebar-backdrop></div>
+
     <div class="detail-grid">
       <div>
         <section class="content-section" aria-labelledby="skill-document">
@@ -102,7 +114,14 @@ function fileIcon(kind: string): string {
         </section>
       </div>
 
-      <aside class="detail-sidebar" aria-label="Skill 信息">
+      <aside class="detail-sidebar" id="skill-info-sidebar" aria-label="Skill 信息" data-mobile-sidebar>
+        <div class="mobile-sidebar-header">
+          <span>页面信息</span>
+          <button class="mobile-sidebar-close" type="button" aria-label="关闭页面信息" data-mobile-sidebar-close>
+            <i class="ph ph-x" aria-hidden="true"></i>
+          </button>
+        </div>
+
         <section class="sidebar-block">
           <h2>Metadata</h2>
           <dl class="metadata-list">
@@ -146,3 +165,42 @@ function fileIcon(kind: string): string {
     </div>
   </main>
 </BaseLayout>
+
+<script>
+  const sidebar = document.querySelector<HTMLElement>('[data-mobile-sidebar]');
+  const openButton = document.querySelector<HTMLButtonElement>('[data-mobile-sidebar-open]');
+  const closeButton = document.querySelector<HTMLButtonElement>('[data-mobile-sidebar-close]');
+  const backdrop = document.querySelector<HTMLElement>('[data-mobile-sidebar-backdrop]');
+  const mobileMedia = window.matchMedia('(max-width: 820px)');
+
+  function setSidebarOpen(open: boolean, returnFocus = false) {
+    if (!sidebar || !openButton || !backdrop) return;
+
+    const isOpen = open && mobileMedia.matches;
+    sidebar.classList.toggle('is-open', isOpen);
+    backdrop.classList.toggle('is-visible', isOpen);
+    openButton.setAttribute('aria-expanded', String(isOpen));
+    sidebar.toggleAttribute('inert', mobileMedia.matches && !isOpen);
+    document.body.classList.toggle('has-mobile-sidebar', isOpen);
+
+    if (isOpen) {
+      closeButton?.focus();
+    } else if (returnFocus) {
+      openButton.focus();
+    }
+  }
+
+  openButton?.addEventListener('click', () => setSidebarOpen(true));
+  closeButton?.addEventListener('click', () => setSidebarOpen(false, true));
+  backdrop?.addEventListener('click', () => setSidebarOpen(false, true));
+  sidebar?.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => setSidebarOpen(false));
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && sidebar?.classList.contains('is-open')) {
+      setSidebarOpen(false, true);
+    }
+  });
+  mobileMedia.addEventListener('change', () => setSidebarOpen(false));
+  setSidebarOpen(false);
+</script>
