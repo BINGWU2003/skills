@@ -4,3 +4,7 @@
 node_modules/
 *.log
 temp/
+site/dist/
+site/.astro/
+site/public/downloads/
+site/public/search-index.json

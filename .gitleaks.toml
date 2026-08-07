@@ -1,0 +1,10 @@
+title = "HJC Skills 凭据扫描配置"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "仅添加经过人工确认的固定误报规则或指纹；不要使用全局忽略。"
+paths = []
+regexes = []
+stopwords = []

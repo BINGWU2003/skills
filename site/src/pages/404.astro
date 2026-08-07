@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../lib/paths';
+---
+
+<BaseLayout title="页面不存在" noindex>
+  <main class="page-shell">
+    <section class="file-hero">
+      <p class="eyebrow">404 / NOT FOUND</p>
+      <h1>这里没有这个 Skill。</h1>
+      <div class="file-toolbar">
+        <a class="button-link" href={withBase()}>
+          <i class="ph ph-arrow-left" aria-hidden="true"></i> 返回目录
+        </a>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

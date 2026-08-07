@@ -1,0 +1,83 @@
+---
+import '@fontsource/geist-sans/400.css';
+import '@fontsource/geist-sans/500.css';
+import '@fontsource/geist-sans/600.css';
+import '@fontsource/geist-mono/400.css';
+import '@fontsource/geist-mono/500.css';
+import '@phosphor-icons/web/regular/style.css';
+import '../styles/global.css';
+
+import { withBase } from '../lib/paths';
+
+type Props = {
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+};
+
+const {
+  title = 'BINGWU Skills',
+  description = 'BINGWU2003 的个人 Agent Skills 集合。浏览、搜索并安装可复用的 Agent Skills。',
+  noindex = false,
+} = Astro.props;
+const pageTitle = title === 'BINGWU Skills' ? title : `${title} · BINGWU Skills`;
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site) : Astro.url;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#050505" />
+    {noindex && <meta name="robots" content="noindex,follow" />}
+    <link rel="canonical" href={canonical} />
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href={withBase()} aria-label="BINGWU Skills 首页">
+        <i class="ph ph-terminal-window" aria-hidden="true"></i>
+        <span>BINGWU Skills</span>
+      </a>
+      <nav aria-label="主导航">
+        <a href={withBase()}>Skills</a>
+        <a href="https://github.com/BINGWU2003/skills" target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+    </header>
+
+    <slot />
+
+    <footer class="site-footer">
+      <p>个人 Agent Skills 集合，由仓库内容自动生成。</p>
+      <a href="https://github.com/BINGWU2003/skills" target="_blank" rel="noreferrer">
+        查看 GitHub 源码 <i class="ph ph-arrow-up-right" aria-hidden="true"></i>
+      </a>
+    </footer>
+
+    <div class="toast" role="status" aria-live="polite" data-toast></div>
+    <script>
+      const toast = document.querySelector<HTMLElement>('[data-toast]');
+      document.addEventListener('click', async event => {
+        const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-copy]');
+        if (!button) return;
+        const value = button.dataset.copy ?? '';
+        await navigator.clipboard.writeText(value);
+        const previousLabel = button.getAttribute('aria-label');
+        button.classList.add('is-copied');
+        button.setAttribute('aria-label', '已复制');
+        if (toast) {
+          toast.textContent = '已复制到剪贴板';
+          toast.classList.add('is-visible');
+        }
+        window.setTimeout(() => {
+          button.classList.remove('is-copied');
+          if (previousLabel) button.setAttribute('aria-label', previousLabel);
+          toast?.classList.remove('is-visible');
+        }, 1600);
+      });
+    </script>
+  </body>
+</html>

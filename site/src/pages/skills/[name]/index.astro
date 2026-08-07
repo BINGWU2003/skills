@@ -1,0 +1,148 @@
+---
+import InstallCommand from '../../../components/InstallCommand.astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { renderMarkdown } from '../../../lib/markdown';
+import { fileHref, formatBytes, formatDate, rawFileHref, skillHref, withBase, zipHref } from '../../../lib/paths';
+import { loadCatalog } from '../../../../../scripts/site-catalog.mjs';
+
+export async function getStaticPaths() {
+  const catalog = await loadCatalog();
+  return catalog.map(skill => ({ params: { name: skill.name }, props: { skill } }));
+}
+
+const { skill } = Astro.props;
+const filePaths = new Set<string>(skill.files.map((file: { path: string }) => file.path));
+const { html, toc } = renderMarkdown(skill.markdown, {
+  skillName: skill.name,
+  currentPath: 'SKILL.md',
+  filePaths,
+});
+const visibleToc = toc.filter(item => item.depth === 2 || item.depth === 3).slice(0, 18);
+
+function displayMetadata(value: unknown): string {
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  return JSON.stringify(value);
+}
+
+function fileIcon(kind: string): string {
+  if (kind === 'image') return 'ph-image';
+  if (kind === 'markdown' || kind === 'text') return 'ph-file-text';
+  return 'ph-file';
+}
+---
+
+<BaseLayout title={skill.name} description={skill.description}>
+  <main class="page-shell">
+    <header class="detail-hero">
+      <nav class="breadcrumb" aria-label="面包屑">
+        <a href={withBase()}>skills</a><span>/</span><span>{skill.name}</span>
+      </nav>
+      <h1>{skill.name}</h1>
+      <p class="detail-description">{skill.description}</p>
+      <div class="detail-actions">
+        <InstallCommand command={skill.installCommand} />
+        <a class="button-link" href={zipHref(skill.name)} download>
+          <i class="ph ph-download-simple" aria-hidden="true"></i> 下载 ZIP
+        </a>
+      </div>
+      {skill.skillDependencies.length > 0 && (
+        <div class="dependency-note">
+          此命令会同时安装 {skill.skillDependencies.length} 个依赖：
+          {skill.skillDependencies.map((dependency: string, index: number) => (
+            <><a href={skillHref(dependency)}>{dependency}</a>{index < skill.skillDependencies.length - 1 ? '、' : ''}</>
+          ))}。
+        </div>
+      )}
+      {skill.requirements.length > 0 && (
+        <div class="requirements">
+          <strong>运行前要求</strong>
+          <ul class="requirements-list">
+            {skill.requirements.map((requirement: { title: string; description: string; path?: string; url?: string }) => (
+              <li>
+                <span>{requirement.title}：</span>{requirement.description}{' '}
+                {requirement.path && <a href={fileHref(skill.name, requirement.path)}>查看说明</a>}
+                {requirement.url && <a href={requirement.url} target="_blank" rel="noreferrer">查看项目</a>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </header>
+
+    <div class="detail-grid">
+      <div>
+        <section class="content-section" aria-labelledby="skill-document">
+          <h2 class="section-heading" id="skill-document">SKILL.md</h2>
+          <article class="prose" data-pagefind-body set:html={html}></article>
+        </section>
+
+        <section class="content-section" aria-labelledby="skill-files">
+          <h2 class="section-heading" id="skill-files">FILES · {skill.files.length}</h2>
+          <ul class="file-list">
+            {skill.files.map((file: { path: string; kind: string; previewable: boolean; size: number }) => (
+              <li style={`--depth:${Math.max(0, file.path.split('/').length - 1)}`}>
+                {file.previewable ? (
+                  <a href={fileHref(skill.name, file.path)}>
+                    <i class={`ph ${fileIcon(file.kind)}`} aria-hidden="true"></i>
+                    <span class="file-path">{file.path}</span>
+                    <span class="file-size">{formatBytes(file.size)}</span>
+                  </a>
+                ) : (
+                  <a href={rawFileHref(skill.name, file.path)} download>
+                    <i class="ph ph-file" aria-hidden="true"></i>
+                    <span class="file-path">{file.path}</span>
+                    <span class="file-size">{formatBytes(file.size)}</span>
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+
+      <aside class="detail-sidebar" aria-label="Skill 信息">
+        <section class="sidebar-block">
+          <h2>Metadata</h2>
+          <dl class="metadata-list">
+            <div><dt>Updated</dt><dd>{formatDate(skill.updatedAt)}</dd></div>
+            <div><dt>Files</dt><dd>{skill.files.length}</dd></div>
+            {skill.metadata.map((item: { key: string; value: unknown }) => (
+              <div><dt>{item.key}</dt><dd>{displayMetadata(item.value)}</dd></div>
+            ))}
+          </dl>
+        </section>
+
+        {visibleToc.length > 0 && (
+          <section class="sidebar-block">
+            <h2>On this page</h2>
+            <ol class="toc-list">
+              {visibleToc.map(item => (
+                <li><a class={`depth-${item.depth}`} href={`#${item.id}`}>{item.text}</a></li>
+              ))}
+            </ol>
+          </section>
+        )}
+
+        <section class="sidebar-block">
+          <h2>Source</h2>
+          <ul class="source-links">
+            <li>
+              <a href={skill.publishedSourceUrl} target="_blank" rel="noreferrer">
+                发布副本 <i class="ph ph-arrow-up-right" aria-hidden="true"></i>
+              </a>
+            </li>
+            {skill.upstream && (
+              <li>
+                <a href={skill.upstream.directoryUrl} target="_blank" rel="noreferrer">
+                  原始上游 <i class="ph ph-arrow-up-right" aria-hidden="true"></i>
+                </a>
+              </li>
+            )}
+          </ul>
+        </section>
+      </aside>
+    </div>
+  </main>
+</BaseLayout>

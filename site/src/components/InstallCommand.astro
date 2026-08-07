@@ -1,0 +1,17 @@
+---
+type Props = {
+  command: string;
+  label?: string;
+};
+
+const { command, label = '安装命令' } = Astro.props;
+---
+
+<div class="command-block">
+  <span class="command-prompt" aria-hidden="true">$</span>
+  <code>{command}</code>
+  <button type="button" class="icon-button" data-copy={command} aria-label={`复制${label}`}>
+    <i class="ph ph-copy" aria-hidden="true"></i>
+    <i class="ph ph-check copy-success" aria-hidden="true"></i>
+  </button>
+</div>

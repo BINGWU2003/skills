@@ -1,0 +1,68 @@
+---
+import { readFile } from 'node:fs/promises';
+
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import { renderMarkdown } from '../../../../lib/markdown';
+import { formatBytes, rawFileHref, skillHref, withBase } from '../../../../lib/paths';
+import { loadCatalog } from '../../../../../../scripts/site-catalog.mjs';
+
+export async function getStaticPaths() {
+  const catalog = await loadCatalog();
+  return catalog.flatMap(skill => skill.files.map(file => ({
+    params: { name: skill.name, path: file.path },
+    props: { skill, file },
+  })));
+}
+
+const { skill, file } = Astro.props;
+const filePaths = new Set<string>(skill.files.map((candidate: { path: string }) => candidate.path));
+const publishedFileUrl = `${skill.publishedSourceUrl.replace('/tree/main/', '/blob/main/')}/${file.path.split('/').map(encodeURIComponent).join('/')}`;
+let content = '';
+let html = '';
+if (file.kind === 'markdown' || file.kind === 'text') {
+  content = await readFile(file.absolutePath, 'utf8');
+}
+if (file.kind === 'markdown') {
+  html = renderMarkdown(content, {
+    skillName: skill.name,
+    currentPath: file.path,
+    filePaths,
+  }).html;
+}
+---
+
+<BaseLayout title={`${file.path} · ${skill.name}`} description={`${skill.name} 中的 ${file.path}`} noindex>
+  <main class="page-shell">
+    <header class="file-hero">
+      <nav class="breadcrumb" aria-label="面包屑">
+        <a href={withBase()}>skills</a><span>/</span>
+        <a href={skillHref(skill.name)}>{skill.name}</a><span>/</span>
+        <span>{file.path}</span>
+      </nav>
+      <h1>{file.path}</h1>
+      <p class="muted">{formatBytes(file.size)} · {file.kind}</p>
+      <div class="file-toolbar">
+        <a class="button-link" href={rawFileHref(skill.name, file.path)} download>
+          <i class="ph ph-download-simple" aria-hidden="true"></i> 下载原始文件
+        </a>
+        <a class="button-link" href={publishedFileUrl} target="_blank" rel="noreferrer">
+          <i class="ph ph-github-logo" aria-hidden="true"></i> 在 GitHub 查看
+        </a>
+      </div>
+    </header>
+
+    <section class="content-section" aria-label="文件预览">
+      {file.kind === 'markdown' && <article class="prose" data-pagefind-body set:html={html}></article>}
+      {file.kind === 'text' && <pre class="source-preview" data-pagefind-body><code>{content}</code></pre>}
+      {file.kind === 'image' && (
+        <div class="image-preview"><img src={rawFileHref(skill.name, file.path)} alt={`${file.path} 预览`} /></div>
+      )}
+      {file.kind === 'binary' && (
+        <div class="binary-preview">
+          <i class="ph ph-file" aria-hidden="true"></i>
+          <p>此文件不支持在线预览，请下载后查看。</p>
+        </div>
+      )}
+    </section>
+  </main>
+</BaseLayout>

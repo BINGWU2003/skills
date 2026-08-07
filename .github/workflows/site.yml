@@ -1,0 +1,48 @@
+name: 校验 Skills 网站
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: skills-site-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: 构建与校验
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: 扫描疑似凭据
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_CONFIG: .gitleaks.toml
+
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22.20.0"
+          cache: pnpm
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 校验并构建网站
+        run: pnpm run site:check

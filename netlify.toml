@@ -1,0 +1,31 @@
+[build]
+  command = "pnpm run site:check"
+  publish = "site/dist"
+
+[build.environment]
+  NODE_VERSION = "22.20.0"
+
+[dev]
+  command = "pnpm run site:dev"
+  targetPort = 4321
+  port = 8888
+  framework = "#custom"
+  autoLaunch = false
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/downloads/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+    X-Content-Type-Options = "nosniff"
