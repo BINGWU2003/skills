@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">BINGWU Skills</title>
+  <desc id="desc">A software package representing a portable and installable Agent Skill.</desc>
+  <style>
+    :root { color: #111827; }
+    @media (prefers-color-scheme: dark) { :root { color: #f5f5f5; } }
+  </style>
+  <g fill="none" stroke="currentColor" stroke-width="30" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M256 78 L402 162 L256 246 L110 162 Z" />
+    <path d="M110 162 V340 L256 426 V246" />
+    <path d="M402 162 V340 L256 426" />
+    <path stroke-width="23" d="M210 151 L256 178 L302 151" />
+  </g>
+</svg>

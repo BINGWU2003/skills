@@ -33,13 +33,14 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site) : Astro.u
     <meta name="description" content={description} />
     <meta name="theme-color" content="#050505" />
     {noindex && <meta name="robots" content="noindex,follow" />}
+    <link rel="icon" href={withBase('favicon.svg')} type="image/svg+xml" />
     <link rel="canonical" href={canonical} />
     <title>{pageTitle}</title>
   </head>
   <body>
     <header class="site-header">
       <a class="brand" href={withBase()} aria-label="BINGWU Skills 首页">
-        <i class="ph ph-terminal-window" aria-hidden="true"></i>
+        <img src={withBase('logo.svg')} width="28" height="28" alt="" aria-hidden="true" />
         <span>BINGWU Skills</span>
       </a>
       <nav aria-label="主导航">

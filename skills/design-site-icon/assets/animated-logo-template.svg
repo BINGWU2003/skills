@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Animated logo template</title>
+  <desc id="desc">Replace the sample paths with an original website icon.</desc>
+  <style>
+    .mark {
+      animation: breathe 5s ease-in-out 2s infinite;
+      transform-origin: 256px 256px;
+    }
+
+    .stroke {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      opacity: 0;
+      animation: draw 4.8s cubic-bezier(.65, 0, .35, 1) infinite;
+    }
+
+    .stroke-2 { animation-delay: .2s; }
+    .stroke-3 { animation-delay: .4s; }
+
+    @keyframes draw {
+      0% { opacity: 0; stroke-dashoffset: 1; }
+      8% { opacity: 1; }
+      42%, 74% { opacity: 1; stroke-dashoffset: 0; }
+      92%, 100% { opacity: 0; stroke-dashoffset: 0; }
+    }
+
+    @keyframes breathe {
+      0%, 100% { opacity: 1; transform: translateY(0); }
+      50% { opacity: .8; transform: translateY(-5px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .mark,
+      .stroke { animation: none; }
+      .stroke { opacity: 1; stroke-dashoffset: 0; }
+    }
+  </style>
+  <!-- Replace every sample path; the cross is intentionally not a finished concept. -->
+  <g class="mark" fill="none" stroke="#f5f5f5" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
+    <path class="stroke stroke-1" pathLength="1" d="M112 256 H400" />
+    <path class="stroke stroke-2" pathLength="1" d="M256 112 V400" />
+    <path class="stroke stroke-3" pathLength="1" d="M154 154 L358 358" />
+  </g>
+</svg>
