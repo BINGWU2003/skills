@@ -1,0 +1,4 @@
+interface:
+  display_name: "网站图标设计"
+  short_description: "为网站设计原创的静态与动态 SVG Logo 和 favicon"
+  default_prompt: "使用 $design-site-icon 为这个网站调研并设计三组动态 SVG 图标候选。"
