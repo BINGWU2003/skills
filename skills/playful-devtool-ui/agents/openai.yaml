@@ -1,0 +1,4 @@
+interface:
+  display_name: "Playful Devtool UI"
+  short_description: "Design precise, playful developer-tool interfaces"
+  default_prompt: "Use $playful-devtool-ui to design a clear, characterful developer-tool interface."
