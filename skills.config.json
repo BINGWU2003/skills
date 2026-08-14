@@ -76,6 +76,33 @@
       }
     ]
   },
+  "gitlab-release-workflow": {
+    "skillDependencies": [
+      "gitlab-url-guard"
+    ],
+    "requirements": [
+      {
+        "title": "Git",
+        "description": "用于检查仓库、分支、提交和差异，并在合并后验证目标分支状态。",
+        "url": "https://git-scm.com/downloads"
+      },
+      {
+        "title": "glab CLI",
+        "description": "创建、更新、查询、评论及合并 GitLab MR，以及读取流水线和 Job 状态时需要已完成认证的 glab。",
+        "url": "https://gitlab.com/gitlab-org/cli"
+      },
+      {
+        "title": "glab Skill（推荐）",
+        "description": "为 MR、流水线、Job 和合并操作提供 GitLab 工作流约束；缺失时可使用已认证的 glab CLI 完成对应步骤。",
+        "url": "https://gitlab.com/gitlab-org/ai/skills/-/tree/main/skills/glab"
+      },
+      {
+        "title": "gitlab-mr-description Skill（推荐）",
+        "description": "创建或更新 MR 前根据分支差异生成结构化描述；缺失时可自行准备描述文件。",
+        "url": "https://gitlab.com/gitlab-org/ai/skills/-/tree/main/skills/gitlab-mr-description"
+      }
+    ]
+  },
   "gitlab-url-guard": {
     "requirements": [
       {
@@ -90,18 +117,8 @@
       },
       {
         "title": "glab CLI（按需）",
-        "description": "执行 GitLab MR 读写或回读校验时需要已认证的 glab；缺失时仍可完成本地链接构造与校验。",
+        "description": "回读 GitLab 中的实际内容并执行写入后校验时需要已认证的 glab；缺失时仍可完成本地链接构造与校验。",
         "url": "https://gitlab.com/gitlab-org/cli"
-      },
-      {
-        "title": "glab Skill（推荐）",
-        "description": "负责创建、更新、查询、评论及合并 MR，以及读取流水线和 Job 状态；缺失时可用可用 CLI 替代，但不得跳过 URL 校验。",
-        "url": "https://gitlab.com/gitlab-org/ai/skills/-/tree/main/skills/glab"
-      },
-      {
-        "title": "gitlab-mr-description Skill（推荐）",
-        "description": "创建或更新 MR 前根据分支差异生成结构化描述，再交给本 Skill 规范化和校验；属于协作能力，不是硬依赖。",
-        "url": "https://gitlab.com/gitlab-org/ai/skills/-/tree/main/skills/gitlab-mr-description"
       }
     ]
   },

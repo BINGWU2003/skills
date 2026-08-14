@@ -1,4 +1,4 @@
 interface:
   display_name: "GitLab 链接校验"
-  short_description: "规范 GitLab 链接并登记流水线成功后自动合并"
-  default_prompt: "使用 $gitlab-url-guard 规范化并校验 GitLab 链接；创建 MR 后保留源分支并显式开启流水线成功后自动合并，需要同步等待时仅使用 glab 做有限状态查询。"
+  short_description: "初始化项目地址并规范化、构造和校验 GitLab 交付链接"
+  default_prompt: "使用 $gitlab-url-guard 初始化项目地址，并规范化、构造和校验 GitLab 交付链接。"
