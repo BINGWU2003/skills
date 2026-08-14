@@ -12,7 +12,7 @@
   --success: #9ce7b0;
   --warning: #f0cc86;
   --content: 1110px;
-  font-family: 'Geist Sans', Arial, sans-serif;
+  font-family: "Geist Sans", Arial, sans-serif;
   background: var(--background);
   color: var(--foreground);
 }
@@ -142,7 +142,7 @@ a {
 .section-label,
 .table-heading,
 .metadata-label {
-  font-family: 'Geist Mono', Consolas, monospace;
+  font-family: "Geist Mono", Consolas, monospace;
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -163,7 +163,7 @@ a {
 
 .hero-title {
   margin: 12px 0 14px;
-  font-family: 'Geist Mono', Consolas, monospace;
+  font-family: "Geist Mono", Consolas, monospace;
   font-size: clamp(48px, 7.5vw, 94px);
   font-weight: 500;
   line-height: 0.92;
@@ -207,7 +207,7 @@ a {
 code,
 pre,
 .mono {
-  font-family: 'Geist Mono', Consolas, monospace;
+  font-family: "Geist Mono", Consolas, monospace;
 }
 
 .command-block code {
@@ -220,7 +220,7 @@ pre,
 
 .command-prompt {
   color: var(--subtle);
-  font-family: 'Geist Mono', Consolas, monospace;
+  font-family: "Geist Mono", Consolas, monospace;
 }
 
 .icon-button {
@@ -268,7 +268,7 @@ pre,
 
 .catalog-count {
   color: var(--muted);
-  font-family: 'Geist Mono', Consolas, monospace;
+  font-family: "Geist Mono", Consolas, monospace;
   font-size: 12px;
 }
 
@@ -293,7 +293,7 @@ pre,
   outline: 0;
   background: transparent;
   color: var(--foreground);
-  font-family: 'Geist Mono', Consolas, monospace;
+  font-family: "Geist Mono", Consolas, monospace;
   font-size: 14px;
 }
 
@@ -306,7 +306,7 @@ pre,
   border: 1px solid var(--border);
   border-radius: 4px;
   color: var(--muted);
-  font-family: 'Geist Mono', Consolas, monospace;
+  font-family: "Geist Mono", Consolas, monospace;
   font-size: 11px;
 }
 
@@ -325,17 +325,17 @@ pre,
   border: 0;
   background: transparent;
   color: var(--muted);
-  font-family: 'Geist Mono', Consolas, monospace;
+  font-family: "Geist Mono", Consolas, monospace;
   font-size: 13px;
   cursor: pointer;
 }
 
-.sort-tabs button[aria-pressed='true'] {
+.sort-tabs button[aria-pressed="true"] {
   color: var(--foreground);
 }
 
-.sort-tabs button[aria-pressed='true']::after {
-  content: '';
+.sort-tabs button[aria-pressed="true"]::after {
+  content: "";
   position: absolute;
   right: 0;
   bottom: -1px;
@@ -353,7 +353,7 @@ pre,
 .skill-table th {
   height: 52px;
   color: var(--muted);
-  font-family: 'Geist Mono', Consolas, monospace;
+  font-family: "Geist Mono", Consolas, monospace;
   font-size: 11px;
   font-weight: 400;
   text-align: left;
@@ -390,7 +390,7 @@ pre,
 .row-index,
 .updated-cell {
   color: var(--muted);
-  font-family: 'Geist Mono', Consolas, monospace;
+  font-family: "Geist Mono", Consolas, monospace;
   font-size: 12px;
 }
 
@@ -449,7 +449,7 @@ pre,
 
 .search-result .snippet {
   color: #b6b6b6;
-  font-family: 'Geist Mono', Consolas, monospace;
+  font-family: "Geist Mono", Consolas, monospace;
   font-size: 12px;
   line-height: 1.55;
 }
@@ -467,7 +467,7 @@ pre,
   flex-wrap: wrap;
   gap: 8px;
   color: var(--muted);
-  font-family: 'Geist Mono', Consolas, monospace;
+  font-family: "Geist Mono", Consolas, monospace;
   font-size: 12px;
 }
 
@@ -550,7 +550,7 @@ pre,
   margin: 0 0 16px;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--border);
-  font-family: 'Geist Mono', Consolas, monospace;
+  font-family: "Geist Mono", Consolas, monospace;
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -601,7 +601,7 @@ pre,
 .heading-anchor {
   margin-left: 8px;
   color: transparent;
-  font-family: 'Geist Mono', Consolas, monospace;
+  font-family: "Geist Mono", Consolas, monospace;
   font-size: 0.65em;
 }
 
@@ -700,7 +700,7 @@ pre,
 
 .sidebar-block h2 {
   margin: 0 0 14px;
-  font-family: 'Geist Mono', Consolas, monospace;
+  font-family: "Geist Mono", Consolas, monospace;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.05em;
@@ -717,7 +717,7 @@ pre,
 
 .metadata-list dt {
   color: var(--muted);
-  font-family: 'Geist Mono', Consolas, monospace;
+  font-family: "Geist Mono", Consolas, monospace;
   font-size: 10px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -762,6 +762,12 @@ pre,
   margin-top: 10px;
 }
 
+.requirement-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .source-links a {
   display: inline-flex;
   align-items: center;
@@ -794,7 +800,7 @@ pre,
 
 .file-path {
   overflow: hidden;
-  font-family: 'Geist Mono', Consolas, monospace;
+  font-family: "Geist Mono", Consolas, monospace;
   font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -802,7 +808,7 @@ pre,
 
 .file-size {
   color: var(--muted);
-  font-family: 'Geist Mono', Consolas, monospace;
+  font-family: "Geist Mono", Consolas, monospace;
   font-size: 10px;
 }
 
@@ -813,7 +819,7 @@ pre,
 .file-hero h1 {
   margin: 0;
   overflow-wrap: anywhere;
-  font-family: 'Geist Mono', Consolas, monospace;
+  font-family: "Geist Mono", Consolas, monospace;
   font-size: clamp(27px, 4vw, 42px);
   line-height: 1.2;
 }
@@ -865,7 +871,9 @@ pre,
   font-size: 12px;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 140ms ease, transform 140ms ease;
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
 }
 
 .toast.is-visible {
@@ -973,7 +981,9 @@ pre,
     background: rgb(0 0 0 / 0.68);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 180ms ease, visibility 180ms ease;
+    transition:
+      opacity 180ms ease,
+      visibility 180ms ease;
   }
 
   .mobile-sidebar-backdrop.is-visible {
@@ -989,7 +999,7 @@ pre,
     gap: 16px;
     margin-bottom: 24px;
     color: var(--foreground);
-    font-family: 'Geist Mono', Consolas, monospace;
+    font-family: "Geist Mono", Consolas, monospace;
     font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.05em;

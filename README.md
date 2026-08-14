@@ -153,8 +153,9 @@ pnpm run site:check
 ```
 
 GitHub Actions 会在 push 和 PR 上执行构建校验；Netlify 连接仓库后根据根目录的
-`netlify.toml` 构建并发布。外部 Skill 的安装依赖和运行要求使用
-`skills.config.json` 中的可选 `skillDependencies` 与 `requirements` 字段维护。
+`netlify.toml` 构建并发布。外部 Skill 的来源和同步路径登记在 `skills.config.json`；Skill 的安装依赖
+和运行要求使用其中的可选 `skillDependencies` 与 `requirements` 字段维护，仓库内
+维护的 Skill 也可以只登记这两个字段。
 
 ## 脚本测试
 
