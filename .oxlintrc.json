@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "warn"
+  },
+  "plugins": ["oxc", "typescript", "unicorn", "vitest"],
+  "rules": {
+    "eslint/no-await-in-loop": "off",
+    "eslint/no-new": "off",
+    "unicorn/no-array-sort": "off",
+    "vitest/require-to-throw-message": "off"
+  },
+  "options": {
+    "denyWarnings": true,
+    "reportUnusedDisableDirectives": "error"
+  }
+}
