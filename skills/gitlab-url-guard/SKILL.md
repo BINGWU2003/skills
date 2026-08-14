@@ -5,7 +5,7 @@ description: 初始化项目级 GitLab Web 地址配置，并规范化、构造�
 
 # GitLab 链接规范化与校验
 
-使用项目根目录 `.codex/gitlab-url-guard.json` 作为唯一可信来源。配置只保存完整项目 Web 地址：
+使用项目根目录下的 `gitlab-url-guard.json` 作为唯一可信来源。无论从仓库根目录还是子目录执行脚本，默认都将配置解析为 `<项目根目录>/gitlab-url-guard.json`。配置只保存完整项目 Web 地址：
 
 ```json
 {
@@ -49,6 +49,8 @@ description: 初始化项目级 GitLab Web 地址配置，并规范化、构造�
 5. 不使用 GitLab API 返回的 `web_url` 作为最终交付链接。
 
 ## 首次初始化
+
+初始化默认在 Git 项目根目录创建 `gitlab-url-guard.json`，不得写入 `.codex/`、Skill 目录或当前子目录。
 
 1. 先预览推断结果，不写文件：
 
