@@ -252,11 +252,10 @@ export async function loadCatalog(options = {}) {
 
     const requirements = skillConfig.requirements ?? [];
     for (const requirement of requirements) {
-      if (requirement.path) {
-        const requirementPath = assertSafeRelativePath(requirement.path, `${skillName} 运行要求路径`);
-        if (!files.some(file => file.path === requirementPath)) {
-          throw new Error(`${skillName} 的运行要求引用了不存在的文件：${requirement.path}`);
-        }
+      const unsupportedField = Object.keys(requirement)
+        .find(field => !['title', 'description', 'url'].includes(field));
+      if (unsupportedField) {
+        throw new Error(`${skillName} 的运行要求包含不支持的字段：${unsupportedField}`);
       }
       if (requirement.url) {
         new URL(requirement.url);

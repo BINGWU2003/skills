@@ -1,7 +1,33 @@
 {
   "agent-git": {
     "submodule": "sources/agent-git",
-    "skillPath": "packages/skill/skills/agent-git"
+    "skillPath": "packages/skill/skills/agent-git",
+    "requirements": [
+      {
+        "title": "Git",
+        "description": "定位仓库、创建 checkpoint、回滚和整理提交历史时需要可用的 git 命令。",
+        "url": "https://git-scm.com/downloads"
+      },
+      {
+        "title": "Node.js 与 npm",
+        "description": "通过 npx 临时运行 Agent-Git CLI，需要可用的 Node.js 与 npm 环境。",
+        "url": "https://nodejs.org/en/download"
+      },
+      {
+        "title": "Agent-Git CLI",
+        "description": "所有 checkpoint、status、undo 和 squash 操作均通过 @agent-git/cli 执行。",
+        "url": "https://www.npmjs.com/package/@agent-git/cli"
+      }
+    ]
+  },
+  "design-site-icon": {
+    "requirements": [
+      {
+        "title": "Python 3",
+        "description": "生成候选预览和校验 SVG 时需要可用的 python 命令。",
+        "url": "https://www.python.org/downloads/"
+      }
+    ]
   },
   "drawio-skill": {
     "submodule": "sources/drawio-skill",
@@ -9,11 +35,18 @@
     "requirements": [
       {
         "title": "draw.io CLI",
-        "description": "导出 PNG、SVG、PDF 或 JPG 时需要安装 draw.io 桌面版并确保 CLI 可调用。"
+        "description": "导出 PNG、SVG、PDF 或 JPG 时需要安装 draw.io 桌面版并确保 CLI 可调用。",
+        "url": "https://github.com/jgraph/drawio-desktop/releases"
       },
       {
         "title": "Graphviz（可选）",
-        "description": "仅在使用自动布局功能时需要。"
+        "description": "仅在使用自动布局功能时需要。",
+        "url": "https://graphviz.org/download/"
+      },
+      {
+        "title": "Python 3",
+        "description": "运行结构校验、PNG 修复、自动布局和浏览器回退等随附脚本时需要。",
+        "url": "https://www.python.org/downloads/"
       }
     ]
   },
@@ -22,14 +55,34 @@
     "skillPath": ".",
     "requirements": [
       {
+        "title": "Python 3.11+",
+        "description": "预览渲染器的 Python 项目要求 Python 3.11 或更高版本。",
+        "url": "https://www.python.org/downloads/"
+      },
+      {
+        "title": "uv",
+        "description": "用于安装和运行预览渲染器的 Python 依赖。",
+        "url": "https://docs.astral.sh/uv/getting-started/installation/"
+      },
+      {
+        "title": "Playwright for Python",
+        "description": "用于安装 Chromium 并把 Excalidraw 文件渲染为预览图。",
+        "url": "https://playwright.dev/python/docs/intro"
+      },
+      {
         "title": "首次配置",
         "description": "预览渲染器需要 uv 和 Playwright；安装后请按随附 README 完成配置。",
-        "path": "README.md"
+        "url": "https://github.com/BINGWU2003/skills/blob/main/skills/excalidraw-diagram/README.md"
       }
     ]
   },
   "gitlab-url-guard": {
     "requirements": [
+      {
+        "title": "Git",
+        "description": "用于定位仓库根目录、读取 remote 并推断目标 GitLab 项目。",
+        "url": "https://git-scm.com/downloads"
+      },
       {
         "title": "Python 3",
         "description": "链接构造、规范化和校验通过 scripts/gitlab_url_guard.py 运行，需要可用的 python 命令。",
@@ -58,6 +111,28 @@
   },
   "weekly-git-report": {
     "submodule": "sources/weekly-git-report",
-    "skillPath": "packages/skill/skills/weekly-git-report"
+    "skillPath": "packages/skill/skills/weekly-git-report",
+    "requirements": [
+      {
+        "title": "Git",
+        "description": "扫描项目并采集提交记录时需要可用的 git 命令。",
+        "url": "https://git-scm.com/downloads"
+      },
+      {
+        "title": "Node.js 18+ 与 npm",
+        "description": "通过 npx 临时运行周报 CLI，需要 Node.js 18 或更高版本及 npm。",
+        "url": "https://nodejs.org/en/download"
+      },
+      {
+        "title": "Weekly Git Report CLI",
+        "description": "首次初始化本地周报配置时使用 weekly 命令。",
+        "url": "https://www.npmjs.com/package/@weekly-git-report/cli"
+      },
+      {
+        "title": "Weekly Git Report Agent CLI",
+        "description": "采集、读取和保存 Agent 周报数据时使用 weekly-agent 命令。",
+        "url": "https://www.npmjs.com/package/@weekly-git-report/agent-cli"
+      }
+    ]
   }
 }

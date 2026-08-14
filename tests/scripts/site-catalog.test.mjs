@@ -191,7 +191,7 @@ describe('loadCatalog', () => {
       alpha: {
         skillDependencies: ['beta'],
         requirements: [
-          { title: 'Setup', path: 'README.md' },
+          { title: 'Setup', url: 'https://example.com/setup' },
           { title: 'Docs', url: 'https://example.com/docs' },
         ],
       },
@@ -277,13 +277,16 @@ describe('loadCatalog', () => {
     );
   });
 
-  it('rejects missing requirement files and invalid requirement URLs', async () => {
-    const missingPath = await createMockFixture({
+  it('rejects unsupported requirement fields and invalid requirement URLs', async () => {
+    const unsupportedField = await createMockFixture({
       files: { 'skills/alpha/SKILL.md': '---\nname: alpha\ndescription: Alpha\n---\n' },
-      config: { alpha: { requirements: [{ path: 'README.md' }] } },
+      config: { alpha: { requirements: [{ title: 'Setup', file: 'README.md' }] } },
     });
-    await expect(loadCatalog({ repoRoot: missingPath.root, runGitCommand: missingPath.runGitCommand })).rejects.toThrow(
-      '运行要求引用了不存在的文件',
+    await expect(loadCatalog({
+      repoRoot: unsupportedField.root,
+      runGitCommand: unsupportedField.runGitCommand,
+    })).rejects.toThrow(
+      '运行要求包含不支持的字段：file',
     );
 
     const invalidUrl = await createMockFixture({
