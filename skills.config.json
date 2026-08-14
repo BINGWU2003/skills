@@ -28,6 +28,30 @@
       }
     ]
   },
+  "gitlab-url-guard": {
+    "requirements": [
+      {
+        "title": "Python 3",
+        "description": "链接构造、规范化和校验通过 scripts/gitlab_url_guard.py 运行，需要可用的 python 命令。",
+        "url": "https://www.python.org/"
+      },
+      {
+        "title": "glab CLI（按需）",
+        "description": "执行 GitLab MR 读写或回读校验时需要已认证的 glab；缺失时仍可完成本地链接构造与校验。",
+        "url": "https://gitlab.com/gitlab-org/cli"
+      },
+      {
+        "title": "glab Skill（推荐）",
+        "description": "负责创建、更新、查询、评论及合并 MR，以及读取流水线和 Job 状态；缺失时可用可用 CLI 替代，但不得跳过 URL 校验。",
+        "url": "https://gitlab.com/gitlab-org/ai/skills/-/tree/main/skills/glab"
+      },
+      {
+        "title": "gitlab-mr-description Skill（推荐）",
+        "description": "创建或更新 MR 前根据分支差异生成结构化描述，再交给本 Skill 规范化和校验；属于协作能力，不是硬依赖。",
+        "url": "https://gitlab.com/gitlab-org/ai/skills/-/tree/main/skills/gitlab-mr-description"
+      }
+    ]
+  },
   "grilling": {
     "submodule": "sources/mattpocock-skills",
     "skillPath": "skills/productivity/grilling"

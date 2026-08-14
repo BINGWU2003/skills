@@ -61,9 +61,15 @@ function fileIcon(kind: string): string {
           <ul class="requirements-list">
             {skill.requirements.map((requirement: { title: string; description: string; path?: string; url?: string }) => (
               <li>
-                <span>{requirement.title}：</span>{requirement.description}{' '}
+                {requirement.url ? (
+                  <a class="requirement-link" href={requirement.url} target="_blank" rel="noreferrer">
+                    {requirement.title} <i class="ph ph-arrow-up-right" aria-hidden="true"></i>
+                  </a>
+                ) : (
+                  <span>{requirement.title}</span>
+                )}
+                {' '}:{' '}{requirement.description}
                 {requirement.path && <a href={fileHref(skill.name, requirement.path)}>查看说明</a>}
-                {requirement.url && <a href={requirement.url} target="_blank" rel="noreferrer">查看项目</a>}
               </li>
             ))}
           </ul>
