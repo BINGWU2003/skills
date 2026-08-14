@@ -15,7 +15,7 @@ if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
 
 
-CONFIG_RELATIVE_PATH = Path(".codex") / "gitlab-url-guard.json"
+CONFIG_FILENAME = "gitlab-url-guard.json"
 RESOURCE_PATHS = {
     "mr": "merge_requests",
     "pipeline": "pipelines",
@@ -54,7 +54,7 @@ def resolve_config_path(explicit: str | None, *, require_existing: bool) -> Path
     if explicit:
         path = Path(explicit).resolve()
     else:
-        path = find_repo_root() / CONFIG_RELATIVE_PATH
+        path = find_repo_root() / CONFIG_FILENAME
     if require_existing and not path.is_file():
         raise GuardError(
             f"未找到配置：{path}。请先执行 init --write，禁止猜测 GitLab 地址。"
