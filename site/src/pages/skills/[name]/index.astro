@@ -49,7 +49,7 @@ function fileIcon(kind: string): string {
       </div>
       {skill.skillDependencies.length > 0 && (
         <div class="dependency-note">
-          此命令会同时安装 {skill.skillDependencies.length} 个依赖：
+          此命令会同时安装 {skill.skillDependencies.length} 个依赖 {' '}:{' '}
           {skill.skillDependencies.map((dependency: string, index: number) => (
             <><a href={skillHref(dependency)}>{dependency}</a>{index < skill.skillDependencies.length - 1 ? '、' : ''}</>
           ))}。
