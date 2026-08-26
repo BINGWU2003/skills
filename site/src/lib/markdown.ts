@@ -80,6 +80,8 @@ export function renderMarkdown(markdown: string, options: RenderOptions): { html
       ...sanitizeHtml.defaults.allowedAttributes,
       '*': ['id', 'class'],
       a: ['href', 'name', 'target', 'rel', 'title'],
+      ol: ['start'],
+      li: ['value'],
       img: ['src', 'alt', 'title', 'width', 'height', 'loading'],
       input: ['type', 'checked', 'disabled'],
       code: ['class'],
