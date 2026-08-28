@@ -126,6 +126,10 @@
     "submodule": "sources/mattpocock-skills",
     "skillPath": "skills/productivity/grilling"
   },
+  "ip-as-logo": {
+    "submodule": "sources/ip-as-logo-skill",
+    "skillPath": "."
+  },
   "weekly-git-report": {
     "submodule": "sources/weekly-git-report",
     "skillPath": "packages/skill/skills/weekly-git-report",

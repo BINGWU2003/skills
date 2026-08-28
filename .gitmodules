@@ -16,3 +16,6 @@
 [submodule "sources/drawio-skill"]
 	path = sources/drawio-skill
 	url = https://github.com/Agents365-ai/drawio-skill.git
+[submodule "sources/ip-as-logo-skill"]
+	path = sources/ip-as-logo-skill
+	url = https://github.com/s1dashu/ip-as-logo-skill
