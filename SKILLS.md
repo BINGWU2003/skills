@@ -11,7 +11,7 @@
 | [`excalidraw-diagram`](skills/excalidraw-diagram/) | 根据自然语言创建 Excalidraw 图表，并通过渲染检查迭代优化视觉效果。                    |
 | [`gitlab-url-guard`](skills/gitlab-url-guard/)     | 规范化并校验 MR、流水线、作业和提交链接，保留源分支并登记流水线成功后自动合并。       |
 | [`grilling`](skills/grilling/)                     | 通过结构化的深入访谈，系统梳理计划、设计或决策中的关键问题。                          |
-| [`hello-skills`](skills/hello-skills/)             | 验证 Skill 的发现、安装和显式调用流程。                                               |
+| [`tdd`](skills/tdd/)                               | 通过红—绿循环按公共接口逐步开发，并确保测试聚焦可观察行为。                          |
 | [`weekly-git-report`](skills/weekly-git-report/)   | 根据 Git 提交记录生成、整理或保存周报。                                               |
 
 ## 特殊安装与依赖

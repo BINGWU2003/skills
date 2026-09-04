@@ -126,6 +126,10 @@
     "submodule": "sources/mattpocock-skills",
     "skillPath": "skills/productivity/grilling"
   },
+  "tdd": {
+    "submodule": "sources/mattpocock-skills",
+    "skillPath": "skills/engineering/tdd"
+  },
   "ip-as-logo": {
     "submodule": "sources/ip-as-logo-skill",
     "skillPath": "."
