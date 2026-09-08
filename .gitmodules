@@ -19,3 +19,9 @@
 [submodule "sources/ip-as-logo-skill"]
 	path = sources/ip-as-logo-skill
 	url = https://github.com/s1dashu/ip-as-logo-skill
+[submodule "sources/archify"]
+	path = sources/archify
+	url = https://github.com/tt-a1i/archify.git
+[submodule "sources/humanlayer-skills"]
+	path = sources/humanlayer-skills
+	url = https://github.com/humanlayer/skills.git
