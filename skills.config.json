@@ -76,6 +76,10 @@
       }
     ]
   },
+  "excalidraw-diagram-generator": {
+    "submodule": "sources/awesome-copilot",
+    "skillPath": "skills/excalidraw-diagram-generator"
+  },
   "gitlab-release-workflow": {
     "skillDependencies": [
       "gitlab-url-guard"

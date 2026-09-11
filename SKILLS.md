@@ -9,6 +9,7 @@
 | [`design-site-icon`](skills/design-site-icon/)     | 为网站设计手写签名式线性 SVG 图标并接入项目，覆盖动态 favicon、明暗主题和小尺寸适配。 |
 | [`drawio-skill`](skills/drawio-skill/)             | 创建 Draw.io 图表，并通过桌面版 CLI 导出 PNG、SVG、PDF 或 JPG。                       |
 | [`excalidraw-diagram`](skills/excalidraw-diagram/) | 根据自然语言创建 Excalidraw 图表，并通过渲染检查迭代优化视觉效果。                    |
+| [`excalidraw-diagram-generator`](skills/excalidraw-diagram-generator/) | 根据自然语言生成 Excalidraw 流程图、架构图和关系图。 |
 | [`gitlab-url-guard`](skills/gitlab-url-guard/)     | 规范化并校验 MR、流水线、作业和提交链接，保留源分支并登记流水线成功后自动合并。       |
 | [`grilling`](skills/grilling/)                     | 通过结构化的深入访谈，系统梳理计划、设计或决策中的关键问题。                          |
 | [`tdd`](skills/tdd/)                               | 通过红—绿循环按公共接口逐步开发，并确保测试聚焦可观察行为。                          |
