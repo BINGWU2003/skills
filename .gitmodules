@@ -25,3 +25,6 @@
 [submodule "sources/humanlayer-skills"]
 	path = sources/humanlayer-skills
 	url = https://github.com/humanlayer/skills.git
+[submodule "sources/awesome-copilot"]
+	path = sources/awesome-copilot
+	url = https://github.com/github/awesome-copilot.git
