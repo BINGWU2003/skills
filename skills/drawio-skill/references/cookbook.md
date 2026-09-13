@@ -128,6 +128,30 @@ Turn schema.sql into an ER diagram with PK/FK markers and crow's-foot
 notation; keep schema prefixes for the billing tables.
 ```
 
+## Event-driven architecture from AsyncAPI
+
+```text
+Turn asyncapi.yaml into an event-driven architecture diagram. Show channels,
+publish and subscribe operations, and referenced payload schemas; group related
+flows by tag and lay them out from left to right.
+```
+
+## Protobuf / gRPC architecture diagram
+
+```text
+Turn our Protocol Buffers schemas under ./proto into a service and message diagram.
+Show RPC methods on the service nodes, group by proto package, and link request/response
+and referenced field types. Output PNG + editable .drawio.
+```
+
+## GraphQL schema type diagram
+
+```text
+Turn our GraphQL SDL under ./schema into an entity type diagram.
+Show each type's fields with their types, link field references and implements,
+group by schema file, and dim the enums. Output PNG + editable .drawio.
+```
+
 ## ML / deep-learning model
 
 ```text
