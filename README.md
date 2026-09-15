@@ -172,3 +172,7 @@ pnpm run test:coverage
 
 每个脚本的行覆盖率与函数覆盖率不得低于 90%，分支覆盖率不得低于 80%。
 GitHub Actions 会在 Ubuntu 和 Windows 上执行覆盖率检查。
+
+## 友情链接
+
+https://linux.do
