@@ -1102,6 +1102,7 @@ async function commandDeliver(args) {
           repository: sourceEvidence.repository.url,
           revision: sourceEvidence.repository.revision,
           references: sourceEvidence.referenceCount,
+          ...(sourceEvidence.repository.linkMode ? { linkMode: sourceEvidence.repository.linkMode } : {}),
         },
       } : {}),
     };
@@ -1224,8 +1225,10 @@ async function commandPreview(args) {
 }
 
 function commandCheck(args) {
+  const unknown = args.find((arg) => arg.startsWith('--'));
+  if (unknown) fail(`Unknown check option "${unknown}".`);
   const [html] = args;
-  if (!html) fail(usage());
+  if (!html || args.length !== 1) fail(usage());
   const result = runNode([path.join(skillRoot, 'scripts/check-render-output.mjs'), html]);
   if (result.status !== 0) exitFrom(result);
 }
@@ -1282,12 +1285,18 @@ async function commandVisualCheck(args) {
   process.exitCode = result.exitCode;
 }
 
-function commandExamples() {
+function commandExamples(args) {
+  const unknown = args.find((arg) => arg.startsWith('--'));
+  if (unknown) fail(`Unknown examples option "${unknown}".`);
+  if (args.length) fail(usage());
   const result = runNode([path.join(skillRoot, 'scripts/render-examples.mjs')], { cwd: skillRoot });
   if (result.status !== 0) exitFrom(result);
 }
 
-async function commandDoctor() {
+async function commandDoctor(args) {
+  const unknown = args.find((arg) => arg.startsWith('--'));
+  if (unknown) fail(`Unknown doctor option "${unknown}".`);
+  if (args.length) fail(usage());
   const checks = [];
   const nodeMajor = Number.parseInt(process.versions.node.split('.')[0], 10);
   checks.push({
@@ -1535,6 +1544,8 @@ async function commandBrands(args) {
 }
 
 function commandDemo(args) {
+  const unknown = args.find((arg) => arg.startsWith('--'));
+  if (unknown) fail(`Unknown demo option "${unknown}".`);
   if (args.length > 1) fail(usage());
 
   const outputDirectory = path.resolve(args[0] || process.cwd());
@@ -2069,10 +2080,10 @@ try {
       await commandBrands(args);
       break;
     case 'examples':
-      commandExamples();
+      commandExamples(args);
       break;
     case 'doctor':
-      await commandDoctor();
+      await commandDoctor(args);
       break;
     case 'demo':
       commandDemo(args);
