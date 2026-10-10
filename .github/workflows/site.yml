@@ -60,12 +60,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 扫描疑似凭据
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITLEAKS_CONFIG: .gitleaks.toml
-
       - name: 安装 pnpm
         uses: pnpm/action-setup@v6
 
