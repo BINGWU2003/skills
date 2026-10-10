@@ -60,17 +60,21 @@ export function shouldCopySkillFile(candidatePath) {
   return ![".git", ".gitignore"].includes(path.basename(candidatePath));
 }
 
-export function buildSubmoduleArgs(repoRoot, submodule, shouldUpdate) {
-  const args = ["-C", repoRoot, "submodule", "update", "--init"];
-  if (shouldUpdate) {
-    args.push("--remote");
-  }
-  args.push("--", submodule);
-  return args;
+export function buildSubmoduleArgs(repoRoot, submodule) {
+  return [
+    "-C",
+    repoRoot,
+    "submodule",
+    "update",
+    "--init",
+    "--remote",
+    "--",
+    submodule,
+  ];
 }
 
 export function parseArgs(args, config) {
-  const allowedOptions = new Set(["--update", "-u", "--help", "-h"]);
+  const allowedOptions = new Set(["--help", "-h"]);
   const unknownOption = args.find(
     (arg) => arg.startsWith("-") && !allowedOptions.has(arg),
   );
@@ -79,7 +83,6 @@ export function parseArgs(args, config) {
   }
 
   const help = args.includes("--help") || args.includes("-h");
-  const shouldUpdate = args.includes("--update") || args.includes("-u");
   const requestedNames = [
     ...new Set(args.filter((arg) => !arg.startsWith("-"))),
   ];
@@ -90,10 +93,10 @@ export function parseArgs(args, config) {
     throw new Error(`没有找到 Skill 配置：${unknownSkill}`);
   }
 
-  return { help, shouldUpdate, skillNames };
+  return { help, skillNames };
 }
 
-export async function syncSkill(skillName, config, shouldUpdate, options = {}) {
+export async function updateSkill(skillName, config, options = {}) {
   const repoRoot = options.repoRoot ?? defaultRepoRoot;
   const runGitCommand =
     options.runGitCommand ??
@@ -115,7 +118,7 @@ export async function syncSkill(skillName, config, shouldUpdate, options = {}) {
     allowEqual: false,
   });
 
-  runGitCommand(buildSubmoduleArgs(repoRoot, config.submodule, shouldUpdate), {
+  runGitCommand(buildSubmoduleArgs(repoRoot, config.submodule), {
     stdio: "inherit",
   });
   await ensureSkillExists(sourcePath, skillName);
@@ -135,7 +138,7 @@ export async function syncSkill(skillName, config, shouldUpdate, options = {}) {
     "--short",
     "HEAD",
   ]);
-  logger.log(`已从 ${skillName}@${sourceCommit} 同步到 skills/${skillName}。`);
+  logger.log(`已更新 ${skillName}@${sourceCommit} 并同步到 skills/${skillName}。`);
 }
 
 export async function main(args = process.argv.slice(2), options = {}) {
@@ -150,18 +153,18 @@ export async function main(args = process.argv.slice(2), options = {}) {
   const parsed = parseArgs(args, config);
 
   if (parsed.help) {
-    logger.log(
-      "用法：node scripts/sync-skills.mjs [skill-name...] [--update|-u]",
-    );
+    logger.log("用法：pnpm run update [-- <skill-name>...]");
     logger.log(`可用 Skill：${Object.keys(config).join(", ")}`);
-    logger.log("不指定 Skill 时同步全部；--update 会先更新对应子模块。");
+    logger.log(
+      "不指定 Skill 时更新全部外部 Skills；先获取上游最新版本，再同步到发布目录。",
+    );
     return;
   }
 
-  const sync =
-    options.sync ??
-    ((skillName, skillConfig, shouldUpdate) =>
-      syncSkill(skillName, skillConfig, shouldUpdate, {
+  const update =
+    options.update ??
+    ((skillName, skillConfig) =>
+      updateSkill(skillName, skillConfig, {
         ...options,
         repoRoot,
         logger,
@@ -169,10 +172,10 @@ export async function main(args = process.argv.slice(2), options = {}) {
   for (const skillName of parsed.skillNames) {
     const skillConfig = config[skillName];
     if (!skillConfig.submodule) {
-      logger.log(`${skillName} 由仓库内维护，没有可同步的子模块来源，已跳过。`);
+      logger.log(`${skillName} 由仓库内维护，没有可更新的子模块来源，已跳过。`);
       continue;
     }
-    await sync(skillName, skillConfig, parsed.shouldUpdate);
+    await update(skillName, skillConfig);
   }
 }
 

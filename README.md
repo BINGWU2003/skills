@@ -101,19 +101,9 @@ pnpm run sources:add -- <repository-url> sources/<project-name>
 不要直接修改由外部来源同步生成的 `skills/<skill-name>/`；同步时保持上游目录和
 frontmatter 原样。改动应先在来源项目中完成，再同步到本仓库。
 
-## 同步与更新
+## 更新外部 Skills
 
-把当前锁定的子模块版本同步到发布目录：
-
-```bash
-# 同步全部外部 Skills
-pnpm run sync
-
-# 只同步指定 Skill
-pnpm run sync -- <skill-name>
-```
-
-拉取子模块 `main` 分支的最新提交并同步：
+添加或更新外部 Skill 后，统一使用 `update` 获取上游最新版本并复制到发布目录：
 
 ```bash
 # 更新全部外部 Skills
@@ -123,7 +113,11 @@ pnpm run update
 pnpm run update -- <skill-name>
 ```
 
-更新完成后，需要同时提交子模块指针和对应的 `skills/<skill-name>/` 发布内容。
+命令会初始化对应子模块，并更新到其远程跟踪分支的最新提交；分支由 `.gitmodules`
+或本地 Git 配置指定，未指定时使用远程默认分支。仓库内维护的 Skill 会自动跳过。
+
+更新完成后，需要同时提交子模块指针和对应的 `skills/<skill-name>/` 发布内容；
+命令不会自动执行 Git 提交。
 
 ## 校验
 

@@ -1,3 +1,5 @@
+import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 
 import { describe, expect, it, vi } from "vitest";
@@ -11,42 +13,63 @@ import {
   parseArgs,
   runGit,
   shouldCopySkillFile,
-  syncSkill,
-} from "../../scripts/sync-skills.mjs";
+  updateSkill,
+} from "../../scripts/update-skills.mjs";
 
-describe("sync-skills", () => {
-  it("parses full, selected, update, help and invalid arguments", () => {
+function git(root, args) {
+  return runGit(args, {
+    repoRoot: root,
+    env: { ...process.env, GIT_ALLOW_PROTOCOL: "file" },
+  });
+}
+
+function commitFixture(root) {
+  git(root, ["add", "."]);
+  git(root, [
+    "-c",
+    "user.name=Tests",
+    "-c",
+    "user.email=tests@example.com",
+    "-c",
+    "commit.gpgsign=false",
+    "commit",
+    "-m",
+    "test: 创建测试版本",
+  ]);
+}
+
+describe("update-skills", () => {
+  it("parses full, selected, help and invalid arguments", () => {
     const config = { alpha: {}, beta: {} };
     expect(parseArgs([], config)).toEqual({
       help: false,
-      shouldUpdate: false,
       skillNames: ["alpha", "beta"],
     });
-    expect(parseArgs(["alpha", "alpha", "-u"], config)).toEqual({
+    expect(parseArgs(["alpha", "alpha"], config)).toEqual({
       help: false,
-      shouldUpdate: true,
       skillNames: ["alpha"],
     });
     expect(parseArgs(["--help"], config).help).toBe(true);
+    expect(parseArgs(["-h"], config).help).toBe(true);
     expect(() => parseArgs(["--wat"], config)).toThrow("不支持的参数：--wat");
+    expect(() => parseArgs(["--update"], config)).toThrow("不支持的参数：--update");
+    expect(() => parseArgs(["-u"], config)).toThrow("不支持的参数：-u");
     expect(() => parseArgs(["missing"], config)).toThrow(
       "没有找到 Skill 配置：missing",
     );
   });
 
-  it("builds submodule arguments with optional remote update", () => {
-    expect(buildSubmoduleArgs("/repo", "sources/alpha", false)).toEqual([
+  it("always updates submodules from the remote", () => {
+    expect(buildSubmoduleArgs("/repo", "sources/alpha")).toEqual([
       "-C",
       "/repo",
       "submodule",
       "update",
       "--init",
+      "--remote",
       "--",
       "sources/alpha",
     ]);
-    expect(buildSubmoduleArgs("/repo", "sources/alpha", true)).toContain(
-      "--remote",
-    );
   });
 
   it("allows equal and dotted sibling names but rejects actual traversal", () => {
@@ -84,7 +107,7 @@ describe("sync-skills", () => {
     expect(shouldCopySkillFile("/source/SKILL.md")).toBe(true);
   });
 
-  it("syncs one skill through injected side effects", async () => {
+  it("updates one skill through injected side effects", async () => {
     const repoRoot = path.resolve("fixture-repo");
     const calls = [];
     const runGitCommand = vi.fn((args) => {
@@ -97,10 +120,9 @@ describe("sync-skills", () => {
     const ensureSkillExists = vi.fn();
     const logger = { log: vi.fn() };
 
-    await syncSkill(
+    await updateSkill(
       "alpha",
       { submodule: "sources/project", skillPath: "skills/alpha" },
-      true,
       {
         repoRoot,
         runGitCommand,
@@ -133,29 +155,28 @@ describe("sync-skills", () => {
     });
     expect(copyPath.mock.calls[0][2].filter("/tmp/.git")).toBe(false);
     expect(logger.log).toHaveBeenCalledWith(
-      "已从 alpha@abc1234 同步到 skills/alpha。",
+      "已更新 alpha@abc1234 并同步到 skills/alpha。",
     );
   });
 
   it("rejects unsafe source and destination configuration", async () => {
     const repoRoot = path.resolve("fixture-repo");
     await expect(
-      syncSkill("alpha", { submodule: "../outside", skillPath: "." }, false, {
+      updateSkill("alpha", { submodule: "../outside", skillPath: "." }, {
         repoRoot,
       }),
     ).rejects.toThrow("子模块路径超出允许范围");
     await expect(
-      syncSkill(
+      updateSkill(
         "alpha",
         { submodule: "sources/project", skillPath: "../../outside" },
-        false,
         {
           repoRoot,
         },
       ),
     ).rejects.toThrow("Skill 来源路径超出允许范围");
     await expect(
-      syncSkill("..", { submodule: "sources/project", skillPath: "." }, false, {
+      updateSkill("..", { submodule: "sources/project", skillPath: "." }, {
         repoRoot,
       }),
     ).rejects.toThrow("发布目标路径超出允许范围");
@@ -163,41 +184,44 @@ describe("sync-skills", () => {
 
   it("prints help or invokes selected skills through main", async () => {
     const logger = { log: vi.fn() };
-    const sync = vi.fn();
+    const update = vi.fn();
     const config = {
       alpha: { submodule: "sources/a" },
       beta: { submodule: "sources/b" },
       gamma: { requirements: [] },
     };
 
-    await main(["--help"], { config, logger, sync });
+    await main(["--help"], { config, logger, update });
     expect(logger.log).toHaveBeenCalledTimes(3);
-    expect(sync).not.toHaveBeenCalled();
+    expect(logger.log).toHaveBeenCalledWith(
+      "用法：pnpm run update [-- <skill-name>...]",
+    );
+    expect(update).not.toHaveBeenCalled();
 
-    await main(["beta", "--update"], { config, logger, sync });
-    expect(sync).toHaveBeenCalledWith("beta", config.beta, true);
+    await main(["beta"], { config, logger, update });
+    expect(update).toHaveBeenCalledWith("beta", config.beta);
   });
 
   it("skips repo-maintained skills without a submodule", async () => {
     const logger = { log: vi.fn() };
-    const sync = vi.fn();
+    const update = vi.fn();
     const config = {
       alpha: { submodule: "sources/a" },
       gamma: { requirements: [] },
     };
 
-    await main([], { config, logger, sync });
-    expect(sync).toHaveBeenCalledTimes(1);
-    expect(sync).toHaveBeenCalledWith("alpha", config.alpha, false);
+    await main([], { config, logger, update });
+    expect(update).toHaveBeenCalledTimes(1);
+    expect(update).toHaveBeenCalledWith("alpha", config.alpha);
     expect(logger.log).toHaveBeenCalledWith(
-      "gamma 由仓库内维护，没有可同步的子模块来源，已跳过。",
+      "gamma 由仓库内维护，没有可更新的子模块来源，已跳过。",
     );
 
-    await main(["gamma"], { config, logger, sync });
-    expect(sync).toHaveBeenCalledTimes(1);
+    await main(["gamma"], { config, logger, update });
+    expect(update).toHaveBeenCalledTimes(1);
   });
 
-  it("reads configuration and uses the default sync adapter", async () => {
+  it("reads configuration and uses the default update adapter", async () => {
     const readTextFile = vi
       .fn()
       .mockResolvedValue('{"alpha":{"submodule":"sources/a","skillPath":"."}}');
@@ -217,9 +241,62 @@ describe("sync-skills", () => {
     });
     expect(readTextFile).toHaveBeenCalledOnce();
     expect(logger.log).toHaveBeenCalledWith(
-      "已从 alpha@deadbee 同步到 skills/alpha。",
+      "已更新 alpha@deadbee 并同步到 skills/alpha。",
     );
   });
+
+  it("fetches a newer upstream commit and replaces published files without committing", async () => {
+    const fixtureRoot = await mkdtemp(path.join(os.tmpdir(), "skills-update-test-"));
+    const upstreamRoot = path.join(fixtureRoot, "upstream");
+    const repoRoot = path.join(fixtureRoot, "consumer");
+
+    try {
+      await mkdir(upstreamRoot);
+      await mkdir(repoRoot);
+      git(upstreamRoot, ["init", "-b", "main"]);
+      await writeFile(path.join(upstreamRoot, "SKILL.md"), "版本 A\n");
+      commitFixture(upstreamRoot);
+
+      git(repoRoot, ["init", "-b", "main"]);
+      git(repoRoot, ["submodule", "add", "-b", "main", upstreamRoot, "sources/alpha"]);
+      const destination = path.join(repoRoot, "skills", "alpha");
+      await mkdir(destination, { recursive: true });
+      await writeFile(path.join(destination, "SKILL.md"), "版本 A\n");
+      await writeFile(path.join(destination, "obsolete.txt"), "过期文件\n");
+      commitFixture(repoRoot);
+      const recordedCommit = git(repoRoot, ["rev-parse", "HEAD"]);
+      const recordedPointer = git(repoRoot, ["ls-files", "--stage", "sources/alpha"]);
+
+      await writeFile(path.join(upstreamRoot, "SKILL.md"), "版本 B\n");
+      commitFixture(upstreamRoot);
+      const latestCommit = git(upstreamRoot, ["rev-parse", "HEAD"]);
+
+      await main(["alpha"], {
+        repoRoot,
+        config: { alpha: { submodule: "sources/alpha", skillPath: "." } },
+        runGitCommand: (args) => git(repoRoot, args),
+        logger: { log: vi.fn() },
+      });
+
+      const submoduleRoot = path.join(repoRoot, "sources", "alpha");
+      expect(git(submoduleRoot, ["rev-parse", "HEAD"])).toBe(latestCommit);
+      const publishedContent = await readFile(path.join(destination, "SKILL.md"), "utf8");
+      expect(publishedContent.trim()).toBe("版本 B");
+      expect(publishedContent).toBe(await readFile(path.join(submoduleRoot, "SKILL.md"), "utf8"));
+      await expect(readFile(path.join(destination, "obsolete.txt"))).rejects.toMatchObject({
+        code: "ENOENT",
+      });
+      await expect(readFile(path.join(destination, ".git"))).rejects.toMatchObject({
+        code: "ENOENT",
+      });
+      expect(git(repoRoot, ["rev-parse", "HEAD"])).toBe(recordedCommit);
+      expect(git(repoRoot, ["ls-files", "--stage", "sources/alpha"])).toBe(recordedPointer);
+      expect(git(repoRoot, ["diff", "--name-only"])).toContain("sources/alpha");
+    } finally {
+      assertInside(os.tmpdir(), fixtureRoot, "测试清理路径");
+      await rm(fixtureRoot, { recursive: true, force: true });
+    }
+  }, 15000);
 
   it("wraps git success, non-zero status and process errors", () => {
     expect(runGit(["--version"])).toMatch(/^git version/);
